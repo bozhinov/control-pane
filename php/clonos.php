@@ -2507,4 +2507,54 @@ class ClonOS {
 
 		return $html;
 	}
+
+	function authkeys_list()
+	{
+		$db = new Db('base','authkey');
+		$res = $db->select('SELECT idx,name FROM authkey;', array());
+
+		$list = [];
+		if(!empty($res))foreach($res as $item){
+			$list[item['idx']] = $item['name'];
+		}
+		return $list;
+	}
+
+	function vm_packages_list()
+	{
+		$db = new Db('base','local');
+		$res = $db->select('select id,name,description,pkg_vm_ram,pkg_vm_disk,pkg_vm_cpus,owner from vmpackages order by name asc;', array());
+
+		$html = '<option value="0"></option>';
+		$min = 0;
+		$min_id = 0;
+		foreach($res as $item){
+			$cpu = $item['pkg_vm_cpus'];
+			$ram = trim($item['pkg_vm_ram']);
+			$ed = substr($ram, -1);
+			if($ed == 'b'){
+				$ed = substr($ram, -2, 1).'b';
+				$ram = substr($ram, 0, -2);
+			}
+			if($ed == 'm' || $ed == 'g') $ed .= 'b';
+			if($ed == 'mb'){
+				$ram1 = substr($ram, 0, -1);
+				$ram1 = $ram1/1000000;
+			}
+			if($ed == 'gb'){
+				$ram1 = substr($ram, 0, -1);
+				$ram1 = $ram1/1000;
+			}
+			$res1 = $cpu + $ram1;
+			if($min>$res1 || $min==0) {
+				$min = $res1;
+				$min_id = $item['id'];
+			}
+
+			$name = '<strong>'.$item['name'].'</strong> (cpu: '.$cpu.'; ram: '.$ram.'; hdd: '.$item['pkg_vm_disk'].')';
+			$html .= '					<option value="'.$item['id'].'" title="'.$item['description'].'">'.$name.'</option>'.PHP_EOL;
+		}
+		return ['html' => $html, 'min_id' => $min_id];
+	}
+
 }

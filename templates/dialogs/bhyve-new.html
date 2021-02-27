@@ -26,7 +26,7 @@ err_messages.add({
 			<p class="new">
 				<span class="field-name">{translate::('VM template (cpu, ram, hdd)')}:</span>
 				<select name="vm_packages" onchange="clonos.onChangePkgTemplate(this,event);">
-<?php $vm_res=$this->config->vm_packages_list(); echo $vm_res['html']; ?> <!-- TODO -->
+<?php $vm_res=$this->vm_packages_list(); echo $vm_res['html']; ?> <!-- TODO -->
 				</select>
 				<script type="text/javascript">clonos.vm_packages_new_min_id=<?php echo $vm_res['min_id']; ?>;</script>
 			</p>
