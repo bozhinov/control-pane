@@ -1954,33 +1954,6 @@ class ClonOS {
 		return array('html'=>$html);
 	}
 
-	function useDialogs($arr=array()){
-		//print_r($arr);
-		$this->_dialogs=$arr;
-	}
-
-	function placeDialogs(){
-		if(empty($this->_dialogs)) return;
-		echo PHP_EOL;
-		foreach($this->_dialogs as $dialog_name){
-			$file_name=$this->realpath_public.'dialogs/'.$dialog_name.'.php';
-			if(file_exists($file_name)){
-				include($file_name);
-				echo PHP_EOL,PHP_EOL;
-			}
-		}
-	}
-
-	function placeDialogByName($dialog_name=null){
-		if(is_null($dialog_name)) return;
-		echo PHP_EOL;
-		$file_name=$this->realpath_public.'dialogs/'.$dialog_name.'.php';
-		if(file_exists($file_name)){
-			include($file_name);
-			echo PHP_EOL,PHP_EOL;
-		}
-	}
-
 	//function getFreeJname($in_helper=false,$type='jail'){
 	function ccmd_getFreeJname($in_helper=false,$type='jail'){
 		$arr=array();

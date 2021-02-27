@@ -1,8 +1,6 @@
 <?php
-$clonos->useDialogs(array(
-	'bases',
-	'bases-repo',
-));
+$tpl->draw('dialogs\bases');
+$tpl->draw('dialogs\bases-repo');
 ?>
 <h1>FreeBSD bases:</h1>
 

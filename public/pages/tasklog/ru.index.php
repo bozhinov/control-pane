@@ -1,7 +1,5 @@
 <?php
-$clonos->useDialogs(array(
-	'tasklog',
-));
+$tpl->draw('dialogs\tasklog');
 ?>
 <h1>Логи задач</h1>
 

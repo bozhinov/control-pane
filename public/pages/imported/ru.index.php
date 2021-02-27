@@ -1,9 +1,7 @@
 <?php
-$clonos->useDialogs(array(
-	'jail-import',
-	'image-import',
-//	'jail-settings-config-menu',
-));
+$tpl->draw('dialogs\jail-import');
+$tpl->draw('dialogs\image-import');
+//$tpl->draw('dialogs\jail-settings-config-menu');
 ?>
 <h1>Импортированные образы:</h1>
 

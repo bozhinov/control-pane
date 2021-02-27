@@ -1,7 +1,5 @@
 <?php
-$clonos->useDialogs(array(
-	'vpnet',
-));
+$tpl->draw('dialogs\vpnet');
 ?>
 <h1>Subnet list</h1>
 

@@ -1,10 +1,7 @@
 <?php
 $section_name='media';
 
-$clonos->useDialogs(array(
-	//$section_name,
-	'media-upload',
-));
+$tpl->draw('dialogs\media-upload');
 ?>
 <h1>Virtual media list</h1>
 

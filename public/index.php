@@ -76,6 +76,5 @@ if(file_exists($file_name)){
 } else {
 	echo '<h1>Not implemented yet!</h1>';
 }
-$clonos->placeDialogs();
 
 $tpl->draw("index.2");

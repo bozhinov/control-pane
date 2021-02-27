@@ -1,12 +1,10 @@
 <?php
-$clonos->useDialogs(array(
-	'vnc-bhyve',
-	'bhyve-new',
-	'bhyve-obtain',
-	'bhyve-clone',
-	'bhyve-rename',
-	'jail-settings-config-menu',
-));
+$tpl->draw('dialogs\vnc-bhyve');
+$tpl->draw('dialogs\bhyve-new');
+$tpl->draw('dialogs\bhyve-obtain');
+$tpl->draw('dialogs\bhyve-clone');
+$tpl->draw('dialogs\bhyve-rename');
+$tpl->draw('dialogs\jail-settings-config-menu');
 ?>
 <h1>Виртуальные машины</h1>
 

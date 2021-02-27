@@ -5,15 +5,12 @@ if(isset($clonos->uri_chunks[1]))
 	return;
 }
 
-
-$clonos->useDialogs(array(
-	'vnc',
-	'jail-settings',
-	'jail-settings-config-menu',
-	'jail-import',
-	'jail-clone',
-	'jail-rename',
-));
+$tpl->draw('dialogs\vnc');
+$tpl->draw('dialogs\jail-settings');
+$tpl->draw('dialogs\jail-settings-config-menu');
+$tpl->draw('dialogs\jail-import');
+$tpl->draw('dialogs\jail-clone');
+$tpl->draw('dialogs\jail-rename');
 
 ?>
 <h1>Jail containers:</h1>

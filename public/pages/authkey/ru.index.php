@@ -1,7 +1,5 @@
 <?php
-$clonos->useDialogs(array(
-	'authkey',
-));
+$tpl->draw('dialogs\authkey');
 ?>
 <h1>Список ключей авторизации</h1>
 

@@ -1,15 +1,6 @@
 <?php
-/*
-if(isset($clonos->uri_chunks[1]))
-{
-	include('helpers.php');
-	return;
-}
-*/
 
-$clonos->useDialogs(array(
-	'k8s-new',
-));
+$tpl->draw('dialogs\k8s-new');
 
 ?>
 <h1>K8S Сlusters:</h1>

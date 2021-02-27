@@ -1,9 +1,5 @@
 <?php
-$clonos->useDialogs(array(
-	'src-get',
-//	'jail-settings',
-//	'jail-settings-config-menu',
-));
+$tpl->draw('dialogs\src-get');
 ?>
 <h1>FreeBSD source codes:</h1>
 

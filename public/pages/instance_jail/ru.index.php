@@ -1,8 +1,3 @@
-<?php
-$clonos->useDialogs(array(
-	
-));
-?>
 <div id="tab1">
 <h1>Шаблоны окружений:</h1>
 

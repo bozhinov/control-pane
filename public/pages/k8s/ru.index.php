@@ -1,15 +1,6 @@
 <?php
-/*
-if(isset($clonos->uri_chunks[1]))
-{
-	include('helpers.php');
-	return;
-}
-*/
 
-$clonos->useDialogs(array(
-	'k8s-new',
-));
+$tpl->draw('dialogs\k8s-new');
 
 /*
 Модуль kubernetes использует в работе преднастроенный образ Linux, который не входит в базовую установку ClonOS.
