@@ -773,7 +773,7 @@ var clonos={
 		}
 	},
 	srcVerAdd:function()
-	{return;
+	{return; // TODO ?!
 		var n,nl;
 		var posts=$('form#srcSettings').serializeArray();
 		var version=$('form#srcSettings input[name="version"]').val();
@@ -2703,7 +2703,7 @@ var clonos={
 	
 	wsconnect:function()
 	{
-		this.client_id=Math.random(10000);	// поменять на сессию
+		this.client_id=Math.random(10000);	// TODO поменять на сессию
 		this.socket = new WebSocket("ws://"+location.hostname+":8023/clonos"+location.pathname);
 		$(this.socket).on('open',$.proxy(this.wsopen,this))
 			.on('close',$.proxy(this.wsclose,this))

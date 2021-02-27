@@ -12,7 +12,9 @@ src_table_pattern='<?php $res=$this->getTableChunk('baseslist','tbody'); echo st
 			<p>
 				<span class="field-name">{translate::('Sources version')}:</span>
 				<select name="sources">
-<?php $this->getBasesCompileList(); ?> <!-- TODO -->
+				{loop="$baseCompileList"}
+					<option value="{$key}">{$value}</option>
+				{/loop}
 				</select>
 			</p>
 			<p>

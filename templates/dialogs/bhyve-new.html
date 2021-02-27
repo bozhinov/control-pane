@@ -51,7 +51,9 @@ err_messages.add({
 				<select name="vm_iso_image">
 					<option value="-2"></option>
 					<option value="-1" selected>Profile default ISO</option>
-<?php echo $this->media_iso_list_html(); ?> <!-- TODO -->
+					{loop="$media_iso_list"}
+					<option value="{$value[0]}">{$value[1]}.{$value[2]}</option>
+					{/loop}
 				</select>
 			</p>
 			<p>

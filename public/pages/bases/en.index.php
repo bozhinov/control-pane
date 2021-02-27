@@ -1,4 +1,5 @@
 <?php
+$tpl->assign('baseCompileList', $this->getBasesCompileList());
 $tpl->draw('dialogs\bases');
 $tpl->draw('dialogs\bases-repo');
 ?>

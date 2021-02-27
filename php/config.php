@@ -221,75 +221,78 @@ class Config
 		}
 	}
 
-	function os_types_create($obtain='new'){
-		$obtain=($obtain=='obtain');
-		if($obtain)
-			$info=$this->os_types_obtain;
-		else
-			$info=$this->os_types;
+	function os_types_create($obtain = 'new')
+	{
+		$obtain = ($obtain == 'obtain');
+		if($obtain){
+			$info = $this->os_types_obtain;
+		} else {
+			$info = $this->os_types;
+		}
 
-		$html='';
-		foreach($info as $num1=>$os)
+		$html = '';
+		foreach($info as $num1 => $os)
 		{
-			$obtain_count=0;
-			$html_tmp='					<optgroup label="'.$os['os'].'">'.PHP_EOL;
-			$items=$os['items'];
-			foreach($items as $num2=>$item)
+			$obtain_count = 0;
+			$html_tmp = '					<optgroup label="'.$os['os'].'">'.PHP_EOL;
+			$items = $os['items'];
+			foreach($items as $num2 => $item)
 			{
-				//if(!isset($item['obtain'])) $item['obtain']=false;
-				//if(!$obtain || $item['obtain'])
-					$html_tmp.='						<option value="'.$num1.'.'.$num2.'">'.$item['name'].'</option>'.PHP_EOL;
-				//if($item['obtain']) $obtain_count++;
+					$html_tmp .= '						<option value="'.$num1.'.'.$num2.'">'.$item['name'].'</option>'.PHP_EOL;
 			}
-			$html_tmp.='					</optgroup>'.PHP_EOL;
+			$html_tmp .= '					</optgroup>'.PHP_EOL;
 			
-			//if(!$obtain || $obtain_count>0) $html.=$html_tmp;
-			$html.=$html_tmp;
+			$html. = $html_tmp;
 		}
 		return $html;
 	}
 
-	function authkeys_list(){
-		$db=new Db('base','authkey');
-		$res=$db->select('SELECT idx,name FROM authkey;', array());
+	function authkeys_list()
+	{
+		$db = new Db('base','authkey');
+		$res = $db->select('SELECT idx,name FROM authkey;', array());
 
-		$html='';
+		$list = [];
 		if(!empty($res))foreach($res as $item){
-			$html.='					<option value="'.$item['idx'].'">'.$item['name'].'</option>'.PHP_EOL;
+			$list[item['idx']] = $item['name'];
 		}
-		return $html;
+		return $list;
 	}
 
-	function vm_packages_list(){
-		$db=new Db('base','local');
-		$res=$db->select('select id,name,description,pkg_vm_ram,pkg_vm_disk,pkg_vm_cpus,owner from vmpackages order by name asc;', array());
+	function vm_packages_list()
+	{
+		$db = new Db('base','local');
+		$res = $db->select('select id,name,description,pkg_vm_ram,pkg_vm_disk,pkg_vm_cpus,owner from vmpackages order by name asc;', array());
 
-		$html='<option value="0"></option>';
-		$min=0;
-		$min_id=0;
-		if(!empty($res))foreach($res as $item){
-			$cpu=$item['pkg_vm_cpus'];
-			$ram=trim($item['pkg_vm_ram']);
-			$ed=substr($ram,-1);
-			if($ed=='b'){
-				$ed=substr($ram,-2,1).'b';
-				$ram=substr($ram,0,-2);
+		$html = '<option value="0"></option>';
+		$min = 0;
+		$min_id = 0;
+		foreach($res as $item){
+			$cpu = $item['pkg_vm_cpus'];
+			$ram = trim($item['pkg_vm_ram']);
+			$ed = substr($ram, -1);
+			if($ed == 'b'){
+				$ed = substr($ram, -2, 1).'b';
+				$ram = substr($ram, 0, -2);
 			}
-			if($ed=='m' || $ed=='g') $ed.='b';
-			if($ed=='mb'){
-				$ram1=substr($ram,0,-1);
-				$ram1=$ram1/1000000;
+			if($ed == 'm' || $ed == 'g') $ed .= 'b';
+			if($ed == 'mb'){
+				$ram1 = substr($ram, 0, -1);
+				$ram1 = $ram1/1000000;
 			}
-			if($ed=='gb'){
-				$ram1=substr($ram,0,-1);
-				$ram1=$ram1/1000;
+			if($ed == 'gb'){
+				$ram1 = substr($ram, 0, -1);
+				$ram1 = $ram1/1000;
 			}
-			$res1=$cpu+$ram1;
-			if($min>$res1 || $min==0) {$min=$res1;$min_id=$item['id'];}
+			$res1 = $cpu + $ram1;
+			if($min>$res1 || $min==0) {
+				$min = $res1;
+				$min_id = $item['id'];
+			}
 
-			$name='<strong>'.$item['name'].'</strong> (cpu: '.$cpu.'; ram: '.$ram.'; hdd: '.$item['pkg_vm_disk'].')';
-			$html.='					<option value="'.$item['id'].'" title="'.$item['description'].'">'.$name.'</option>'.PHP_EOL;
+			$name = '<strong>'.$item['name'].'</strong> (cpu: '.$cpu.'; ram: '.$ram.'; hdd: '.$item['pkg_vm_disk'].')';
+			$html .= '					<option value="'.$item['id'].'" title="'.$item['description'].'">'.$name.'</option>'.PHP_EOL;
 		}
-		return array('html'=>$html,'min_id'=>$min_id);
+		return ['html' => $html, 'min_id' => $min_id];
 	}
 }

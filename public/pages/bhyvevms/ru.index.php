@@ -1,6 +1,8 @@
 <?php
 $tpl->draw('dialogs\vnc-bhyve');
+$tpl->assign("media_iso_list", $this->media_iso_list());
 $tpl->draw('dialogs\bhyve-new');
+$tpl->assign("authkeys_list", $this->config->authkeys_list());
 $tpl->draw('dialogs\bhyve-obtain');
 $tpl->draw('dialogs\bhyve-clone');
 $tpl->draw('dialogs\bhyve-rename');

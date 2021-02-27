@@ -65,11 +65,11 @@
 		<li><a name="">
 				<select id="lng-sel">
 					{loop="$langs"}
-							{if="$lang == $key"}
-							<option value="{$key}" selected="selected">{$value}</option> 
-							{else}
-								<option value="{$key}">{$value}</option>
-							{/if}
+						{if="$lang == $key"}
+						<option value="{$key}" selected="selected">{$value}</option> 
+						{else}
+							<option value="{$key}">{$value}</option>
+						{/if}
 					{/loop}
 				</select>
 		</a></li>

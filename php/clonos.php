@@ -23,7 +23,6 @@ class ClonOS {
 	public $sys_vars=array();
 	private $_locale;
 	private $_db=null;
-	private $_dialogs=array();
 	private $_cmd_array=array(
 		'jcreate','jstart','jstop',
 		'jrestart','jedit','jremove',
@@ -1823,17 +1822,19 @@ class ClonOS {
 	}
 
 	function getBasesCompileList(){
-		$db1=new Db('base','local');
-		if($db1!==false){
-			$bases=$db1->select("SELECT idx,platform,ver FROM bsdsrc order by cast(ver AS int)", array());
+		$db1 = new Db('base','local');
+		$list = [];
+		if($db1 !== false){
+			$bases = $db1->select("SELECT idx,platform,ver FROM bsdsrc order by cast(ver AS int)", array());
 
-			if(!empty($bases)) foreach($bases as $base){
-				$val=$base['idx'];
-				$stable=strlen(intval($base['ver']))<strlen($base['ver'])?'release':'stable';
-				$name=$base['platform'].' '.$base['ver'].' '.$stable;
-				echo '					<option value="'.$val.'">'.$name.'</option>',PHP_EOL;
+			foreach($bases as $base){
+				$val = $base['idx'];
+				$stable = strlen(intval($base['ver'])) < strlen($base['ver']) ? 'release' : 'stable';
+				$name = $base['platform'].' '.$base['ver'].' '.$stable;
+				$list[$val] = $name;
 			}
 		}
+		return $list;
 	}
 
 /*
@@ -2144,17 +2145,17 @@ class ClonOS {
 		return '<span class="cbsd-str">'.$cmd_string.'</span>';
 	}
 
-	function media_iso_list_html(){
-//		$form=$this->form;
-		$db=new Db('base','storage_media');
-		$res=$db->select('select * from media where type="iso"', array());
-		if($res===false || empty($res)) return;
+	function media_iso_list()
+	{
+		$db = new Db('base','storage_media');
+		$res = $db->select('select * from media where type="iso"', array());
+		if($res === false || empty($res)) return;
 
-		$html='';
+		$list = [];
 		foreach($res as $r){
-			$html.='<option value="'.$r['idx'].'">'.$r['name'].'.'.$r['type'].'</option>';
+			$list[] = [$r['idx'], $r['name'], $r['type']];
 		}
-		return $html;
+		return $list;
 	}
 
 	function ccmd_updateBhyveISO($iso=''){
