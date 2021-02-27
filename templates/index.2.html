@@ -1,0 +1,32 @@
+	</div>
+	<div id="cdown"><span class="split-close"></span>
+	<div id="cinfo">
+			<div class="left">
+				<dl id="summaryInfo">
+					<dt>Имя клетки:</dt>
+					<dd>Jail1</dd>
+				</dl>
+			</div>
+			<div class="right">
+				<h2>{translate::('CPU usage')}, %:</h2>
+				<div class="graph v-black g--summary-cpu l-cpu"></div>
+				<br />
+				<h2>{translate::('Memory usage')}, %:</h2>
+				<div class="graph v-black g--summary-mem l-mem"></div>
+				<br />
+				<h2>{translate::('I/O storage')}, iops:</h2>
+				<div class="graph v-black g--summary-iops l-read,write pr-no te-iops"></div>
+				<br />
+				<h2>{translate::('I/O storage')}, bit per seconds:</h2>
+				<div class="graph v-black g--summary-bps l-read,write pr-no te-bps"></div>
+			</div>
+	</div>
+	</div>
+	</div>
+	</div>
+</main>
+
+<div class="spinner"></div>
+<div class="online icon-online" id="net-stat" onclick="ws_debug();"></div>
+</body>
+</html>

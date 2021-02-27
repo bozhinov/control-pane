@@ -1,7 +1,16 @@
 <?php
-header('Content-Type: application/json');
 
-require_once("../php/cbsd.php");
+if (isset($auth)){
+	if ($auth->authorized != true){
+		header('HTTP/1.1 401 Unauthorized');
+		exit;
+	}
+} else { # TODO: revisit this
+	header('HTTP/1.1 401 Unauthorized');
+	exit;
+}
+
+header('Content-Type: application/json');
 
 $cmd='';
 $status = '';
@@ -38,7 +47,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
 		if (move_uploaded_file($_FILES['file']['tmp_name'], $path.$basename)){
 			$status = 'ok';	//'Successfully uploaded!';
 			if($cmd=='import'){
-				$res=CBSD::run('task owner=%s mode=new /usr/local/bin/cbsd jimport jname=%s inter=0', [$clonos->getUserName(), $path.$basename]);
+				$res=CBSD::run('task owner=%s mode=new /usr/local/bin/cbsd jimport jname=%s inter=0', [$auth->getUserName(), $path.$basename]);
 			}
 		} else {
 			$status = 'Upload Fail: Unknown error occurred!';

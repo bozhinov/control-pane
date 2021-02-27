@@ -4,6 +4,7 @@ require_once("cbsd.php");
 
 class Config
 {
+	public static $version = '20.12';
 	/* Список языков, используемых в проекте */
 	public static $languages=array(
 		'en'=>'English',
@@ -127,12 +128,6 @@ class Config
 			'name'=>'TaskLog',
 			'title'=>'System task log',
 			'icon'=>'icon-list-alt',
-		),
-
-		'sqlite'=>array(
-			'name'=>'SQLite admin',
-			'title'=>'SQLite admin interface',
-			'icon'=>'icon-wpforms',
 		)
 	);
 
