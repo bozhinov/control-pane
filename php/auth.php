@@ -303,6 +303,17 @@ class Auth {
 		return $res;
 	}
 
+	public static function json_usersGetInfo()
+	{
+		$db = new Db('clonos');
+		if($db->isConnected()){
+			$res = $db->select("select id,username,first_name,last_name,date_joined,last_login,is_active from auth_user order by date_joined desc", []);
+		} else {
+			return ['error' => true,'error_message' => 'DB connection error!'];
+		}
+		return $res;
+	}
+
 	function getUserName()
 	{
 		return $this->_user_info['username'];

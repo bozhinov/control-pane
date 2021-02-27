@@ -113,7 +113,7 @@ class ClonOS {
 				return;
 			}
 
-			$included_result_array='';
+			$included_result_array=''; # used in a.jason files
 			switch($this->mode){
 				//case 'login':	 		echo json_encode($this->login()); return;
 				case 'getTasksStatus':		echo json_encode($this->_getTasksStatus($this->form['jsonObj'])); return;

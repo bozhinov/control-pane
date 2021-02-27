@@ -1,7 +1,5 @@
 <?php
-$clonos->useDialogs(array(
-	'users-new',
-));
+$tpl->draw('dialogs\users-new');
 ?>
 
 <h1>Пользователи CBSD</h1>
