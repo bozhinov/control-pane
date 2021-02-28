@@ -2520,7 +2520,7 @@ class ClonOS {
 		$db = new Db('base','local');
 		$res = $db->select('select id,name,description,pkg_vm_ram,pkg_vm_disk,pkg_vm_cpus,owner from vmpackages order by name asc;', array());
 
-		$html = '';
+		$html = [];
 		$min = 0;
 		$min_id = 0;
 		foreach($res as $item){
@@ -2546,7 +2546,7 @@ class ClonOS {
 				$min_id = $item['id'];
 			}
 
-			$name = [
+			$html[] = [
 				'name' => $item['name'],
 				'text' => '(cpu: '.$cpu.'; ram: '.$ram.'; hdd: '.$item['pkg_vm_disk'].')',
 				'id' => $item['id'],
