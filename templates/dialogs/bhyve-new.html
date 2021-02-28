@@ -86,7 +86,9 @@ err_messages.add({
 				<!-- <input type="radio" name="interface" value="auto" id="rint0" checked="checked" class="inline"><label for="rint0">auto</label></radio> -->
 				<select name="interface">
 					<option value="auto">auto</option>
-<?php echo $this->get_interfaces_html(); ?> <!-- TODO -->
+					{loop="$ifs"}
+						<option value="{$value}">{$value}</option>
+					{/loop}
 				</select>
 			</p>
 		</div>

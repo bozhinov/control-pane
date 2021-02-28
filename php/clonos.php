@@ -79,12 +79,9 @@ class ClonOS {
 		$this->_locale = new Localization($this->realpath_public);
 
 		if(isset($this->_vars['path'])){
-			//$this->realpath_page=$this->realpath_public.'pages/'.trim($this->_vars['path'],'/').'/';
 			$this->realpath_page = $this->realpath_public.'pages/'.$this->uri_chunks[0].'/';
 			$this->json_name = $this->realpath_page.'a.json.php';
-			//echo $this->realpath_page;
 		}else if($_SERVER['REQUEST_URI']){
-			//$this->realpath_page=$this->realpath_public.'pages/'.trim($_SERVER['REQUEST_URI'],'/').'/';
 			if(isset($this->uri_chunks[0])){
 				$this->realpath_page = $this->realpath_public.'pages/'.$this->uri_chunks[0].'/';
 			}
@@ -2178,16 +2175,13 @@ class ClonOS {
 		return $html;
 	}
 
-	function get_interfaces_html(){
+	function get_interfaces(){
 		$if=$this->config->os_interfaces;
-		$html='';
-		//$m=1;
+		$list=[];
 		foreach($if as $i){
-			//$html.='<input type="radio" name="interface" value="'.$i['name'].'" id="rint'.$m.'" class="inline"><label for="rint'.$m.'">'.$i['name'].'</label></radio>';
-			$html.='<option value="'.$i['name'].'">'.$i['name'].'</option>';
-			//$m++;
+			$list[] = $i['name'];
 		}
-		return $html;
+		return $list;
 	}
 
 	function ccmd_vmTemplateAdd(){
