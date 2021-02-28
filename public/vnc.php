@@ -7,17 +7,17 @@ if(!isset($_GET['jname'])){
 
 function runVNC($jname)
 {
-	$res=(new Db('base','local'))->selectOne("SELECT vnc_password FROM bhyve WHERE jname=?", array([$jname]));
+	$res = (new Db('base','local'))->selectOne("SELECT vnc_password FROM bhyve WHERE jname=?", array([$jname]));
 
-	$pass='cbsd';
-	if($res!==false) $pass=$res['vnc_password'];
+	$pass = 'cbsd';
+	if($res! == false) $pass = $res['vnc_password'];
 
 	CBSD::run("vm_vncwss jname=%s permit=%s", $_SERVER['REMOTE_ADDR']);
 
 	if(isset($_SERVER['SERVER_NAME']) && !empty(trim($_SERVER['SERVER_NAME']))){
-		$nodeip=$_SERVER['SERVER_NAME'];
+		$nodeip = $_SERVER['SERVER_NAME'];
 	} else {
-		$nodeip=$_SERVER['SERVER_ADDR'];
+		$nodeip = $_SERVER['SERVER_ADDR'];
 	}
 
 	# TODO: This will send the pass in clear text
@@ -25,8 +25,7 @@ function runVNC($jname)
 	exit;
 }
 
-$rp=realpath('../');
-require_once($rp.'/php/db.php');
-require_once($rp.'/php/cbsd.php');
+require_once('../php/db.php');
+require_once('../php/cbsd.php');
 
 runVNC($_GET['jname']);
