@@ -8,22 +8,25 @@ require_once('forms.php');
 require_once('utils.php');
 
 class ClonOS {
-	public $server_name='';
-	public $workdir='';
-	public $environment='';
-	public $realpath='';
-	public $realpath_public='';
-	public $realpath_page='';
-	public $uri_chunks=array();
-	public $json_name='';
-	public $table_templates=array();
-	public $url_hash='';
-	public $media_import='';
-	public $json_req=false;
-	public $sys_vars=array();
+	public $server_name = '';
+	public $workdir = '';
+	public $mode = '';
+	public $form = '';
+	public $environment = '';
+	public $realpath = '';
+	public $realpath_public = '';
+	public $realpath_page = '';
+	public $uri_chunks = [];
+	public $json_name = '';
+	public $table_templates = [];
+	public $url_hash = '';
+	public $media_import = '';
+	public $json_req = false;
+	public $sys_vars = [];
+	private $_vars = [];
 	private $_locale;
-	private $_db=null;
-	private $_cmd_array=array(
+	private $_db = null;
+	private $_cmd_array = [
 		'jcreate','jstart','jstop',
 		'jrestart','jedit','jremove',
 		'jexport','jimport','jclone',
@@ -33,17 +36,13 @@ class ClonOS {
 		'bremove','bclone','brename',
 		'vm_obtain','removesrc','srcup',
 		'removebase','world','repo','forms'
-	);
+	];
 
 /*
 	public $projectId=0;
 	public $jailId=0;
 	public $moduleId=0;
 	public $helper='';
-	public $mode='';
-	public $form='';
-
-	private $_vars=array();
 	private $_db_tasks=null;
 	private $_db_jails=null;
 */
@@ -195,11 +194,6 @@ class ClonOS {
 */
 			}
 		}
-	}
-
-	function translate($phrase)
-	{
-		return $this->_locale->translate($phrase);
 	}
 
 	function ccmd_getJsonPage(){
@@ -497,77 +491,90 @@ class ClonOS {
 		return $obj;
 	}
 
-	function ccmd_jailRename() {
-		$form=$this->_vars['form_data'];
+	function ccmd_jailRename()
+	{
+		$form = $this->_vars['form_data'];
 		$cmd = "task owner=%s mode=new {cbsd_loc} jrename old=%s new=%s host_hostname=%s ip4_addr=%s restart=1";
-		$args = array(
+		$args = [
 			$this->_user_info['username'], 
 			$form['oldJail'], 
 			$form['jname'], 
 			$form['host_hostname'], 
 			$form['ip4_addr']
-		);
-		$res=CBSD::run($cmd, $args);
+		];
+		$res = CBSD::run($cmd, $args);
 
-		$err='Jail is not renamed!';
-		$taskId=-1;
-		if($res['retval']==0){
-			$err='Jail was renamed!';
-			$taskId=$res['message'];
-		}else{
-			$err=$res['error'];
+		$err = 'Jail is not renamed!';
+		$taskId = -1;
+		if($res['retval'] == 0){
+			$err = 'Jail was renamed!';
+			$taskId = $res['message'];
+		} else {
+			$err = $res['error'];
 		}
 
-		return array('errorMessage'=>$err,'jail_id'=>$form['jname'],'taskId'=>$taskId,'mode'=>$this->mode);
+		return [
+			'errorMessage' => $err,
+			'jail_id' => $form['jname'],
+			'taskId' => $taskId,
+			'mode' => $this->mode
+		];
 	}
 
-	function ccmd_jailClone() {
-		$form=$this->_vars['form_data'];
+	function ccmd_jailClone()
+	{
+		$form = $this->_vars['form_data'];
 		$cmd = 'task owner=%s mode=new {cbsd_loc} jclone checkstate=0 old=%s new=%s host_hostname=%s ip4_addr=%s';
-		$args = array(
+		$args = [
 			$this->_user_info['username'], 
 			$form['oldJail'], 
 			$form['jname'],
 			$form['host_hostname'], 
 			$form['ip4_addr']
-		);
-		$res=CBSD::run($cmd, $args);
+		];
+		$res = CBSD::run($cmd, $args);
 
-		$err='Jail is not cloned!';
-		$taskId=-1;
-		if($res['retval']==0){
-			$err='Jail was cloned!';
-			$taskId=$res['message'];
-		}else{
-			$err=$res['error'];
+		$err = 'Jail is not cloned!';
+		$taskId = -1;
+		if($res['retval'] == 0){
+			$err = 'Jail was cloned!';
+			$taskId = $res['message'];
+		} else {
+			$err = $res['error'];
 		}
 
-		$html='';
-		$hres=$this->getTableChunk('jailslist','tbody');
-		if($hres!==false){
-			$html_tpl=$hres[1];
-			$vars=array(
-				'nth-num'=>'nth0',				// TODO: actual data
-				'node'=>'local',				// TODO: actual data
-				'ip4_addr'=>str_replace(',',',<wbr />',$form['ip4_addr']),
-				'jname'=>$form['jname'],
-				'jstatus'=>$this->_locale->translate('Cloning'),
-				'icon'=>'spin6 animate-spin',
-				'desktop'=>' s-on',
-				'maintenance'=>' maintenance',
-				'protected'=>'icon-cancel',
-				'protitle'=>$this->_locale->translate('Delete'),
-				'vnc_title'=>$this->_locale->translate('Open VNC'),
-				'reboot_title'=>$this->_locale->translate('Restart jail'),
-			);
+		$html = '';
+		$hres = $this->getTableChunk('jailslist','tbody');
+		if($hres !== false){
+			$html_tpl = $hres[1];
+			$vars = [
+				'nth-num' => 'nth0',	// TODO: actual data
+				'node' => 'local',		// TODO: actual data
+				'ip4_addr' => str_replace(',',',<wbr />',$form['ip4_addr']),
+				'jname' => $form['jname'],
+				'jstatus' => $this->_locale->translate('Cloning'),
+				'icon' => 'spin6 animate-spin',
+				'desktop' => ' s-on',
+				'maintenance' => ' maintenance',
+				'protected' => 'icon-cancel',
+				'protitle' => $this->_locale->translate('Delete'),
+				'vnc_title' => $this->_locale->translate('Open VNC'),
+				'reboot_title' => $this->_locale->translate('Restart jail')
+			];
 
-			foreach($vars as $var=>$val)
-				$html_tpl=str_replace('#'.$var.'#',$val,$html_tpl);
-
-			$html=$html_tpl;
+			foreach($vars as $var => $val){
+				$html_tpl = str_replace('#'.$var.'#', $val, $html_tpl);
+			}
+			$html = $html_tpl;
 		}
 
-		return array('errorMessage'=>$err,'jail_id'=>$form['jname'],'taskId'=>$taskId,'mode'=>$this->mode,'html'=>$html);
+		return [
+			'errorMessage' => $err,
+			'jail_id' => $form['jname'],
+			'taskId' => $taskId,
+			'mode' => $this->mode,
+			'html' => $html
+		];
 	}
 
 	function getJailInfo($jname,$op=''){
@@ -649,8 +656,7 @@ class ClonOS {
 		);
 	}
 
-	function jailAdd($redirect=''){	//$mode='jailAdd'
-		//if(!empty($arr)) $form=$arr; else
+	function jailAdd($redirect=''){
 		$form=$this->form;
 		$helper=preg_replace('/^#/','',$this->_vars['hash']);
 

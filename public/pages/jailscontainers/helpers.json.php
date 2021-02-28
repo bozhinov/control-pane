@@ -22,7 +22,7 @@ if(empty($hash)){
 			if(isset($res['longdesc'])){
 				$description = $res['longdesc'];
 			} else {
-				$description = $this->translate('no data').'&hellip; ('.$file_name.')';
+				$description = $tpl->translate('no data').'&hellip; ('.$file_name.')';
 			}
 			$lst[] = ['helper' => $helper, 'description' => $description];
 		}else{
@@ -55,7 +55,7 @@ if(empty($hash)){
 			$html .= $tpl;
 		}
 	} else {
-		$html = '<tr><td colspan="3">'.$this->translate('No installed helpers').'</td></tr>';
+		$html = '<tr><td colspan="3">'.$tpl->translate('No installed helpers').'</td></tr>';
 	}
 
 	// Определяем список хелперов, доступных для установки в клетку
@@ -87,7 +87,7 @@ if(empty($hash)){
 
 	$db_path = $db->getFileName();
 	$res_html = (new Forms($jail_name, $hash, $db_path))->generate();
-	$res_html = '<h1>'.$this->translate('Helper settings: '.$hash).'</h1>'.$res_html;
+	$res_html = '<h1>'.$tpl->translate('Helper settings: '.$hash).'</h1>'.$res_html;
 }
 
 $included_result_array = [

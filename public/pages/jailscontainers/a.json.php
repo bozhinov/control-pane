@@ -47,14 +47,14 @@ foreach($nodes as $node){
 					'vnc_port' => $vnc_port,
 					'vnc_port_status' => $vnc_port_status,
 					'status' => $status,
-					'jstatus' => $this->translate($statuses[$status]),
+					'jstatus' => $tpl->translate($statuses[$status]),
 					'icon' => ($status == 0) ? 'play' : 'stop',
 					'desktop' => ($status == 0) ? ' s-off' : ' s-on',
 					'maintenance' => ($status == 3)?' maintenance':'',
 					'protected' => ($jail['protected'] == 1) ? 'icon-lock' : 'icon-cancel',
-					'protitle' => ($jail['protected'] == 1) ? ' title="'.$this->translate('Protected jail').'"' : ' title="'.$this->translate('Delete').'"',
-					'vnc_title' => $this->translate('Open VNC'),
-					'reboot_title' => $this->translate('Restart jail'),
+					'protitle' => ($jail['protected'] == 1) ? ' title="'.$tpl->translate('Protected jail').'"' : ' title="'.$tpl->translate('Delete').'"',
+					'vnc_title' => $tpl->translate('Open VNC'),
+					'reboot_title' => $tpl->translate('Restart jail'),
 				];
 
 				foreach($vars as $var => $val){
@@ -85,14 +85,14 @@ if($hres !== false){
 	$vars = [
 		'nth-num' => 'nth0',
 		'status' => '',
-		'jstatus' => $this->translate('Creating'),
+		'jstatus' => $tpl->translate('Creating'),
 		'icon' => 'spin6 animate-spin',
 		'desktop' => ' s-off',
 		'maintenance' => ' maintenance busy',
 		'protected' => 'icon-cancel',
 		'protitle' => '',
-		'vnc_title' => $this->translate('Open VNC'),
-		'reboot_title' => $this->translate('Restart jail')
+		'vnc_title' => $tpl->translate('Open VNC'),
+		'reboot_title' => $tpl->translate('Restart jail')
 	];
 
 	foreach($vars as $var => $val){
@@ -103,11 +103,11 @@ if($hres !== false){
 $protected = [
 	0 => [
 		'icon' => 'icon-cancel',
-		'title' => $this->translate('Delete')
+		'title' => $tpl->translate('Delete')
 	],
 	1 => [
 		'icon' => 'icon-lock',
-		'title' => $ this->translate('Protected jail')
+		'title' => $tpl->translate('Protected jail')
 	]
 ];
 
