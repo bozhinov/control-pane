@@ -182,11 +182,6 @@ class ClonOS {
 				//case 'srcUpdate':		echo json_encode($this->srcUpdate()); return;
 				//case 'srcRemove':		echo json_encode($this->srcRemove()); return;
 				//case 'baseRemove':		echo json_encode($this->baseRemove()); return;
-				//case 'usersAdd':		echo json_encode($this->usersAdd()); return;
-				//case 'usersEdit':		echo json_encode($this->usersEdit()); return;
-				//case 'userRemove':		echo json_encode($this->userRemove()); return;
-				//case 'userGetInfo':		echo json_encode($this->userGetInfo()); return;
-				//case 'userEditInfo':		echo json_encode($this->userEditInfo()); return;
 				//case 'vmTemplateAdd':		echo json_encode($this->vmTemplateAdd()); return;
 				//case 'vmTemplateEditInfo':	echo json_encode($this->vmTemplateEditInfo()); return;
 				//case 'vmTemplateEdit':		echo json_encode($this->vmTemplateEdit()); return;
@@ -2525,7 +2520,7 @@ class ClonOS {
 		$db = new Db('base','local');
 		$res = $db->select('select id,name,description,pkg_vm_ram,pkg_vm_disk,pkg_vm_cpus,owner from vmpackages order by name asc;', array());
 
-		$html = '<option value="0"></option>';
+		$html = '';
 		$min = 0;
 		$min_id = 0;
 		foreach($res as $item){
@@ -2551,10 +2546,14 @@ class ClonOS {
 				$min_id = $item['id'];
 			}
 
-			$name = '<strong>'.$item['name'].'</strong> (cpu: '.$cpu.'; ram: '.$ram.'; hdd: '.$item['pkg_vm_disk'].')';
-			$html .= '					<option value="'.$item['id'].'" title="'.$item['description'].'">'.$name.'</option>'.PHP_EOL;
+			$name = [
+				'name' => $item['name'],
+				'text' => '(cpu: '.$cpu.'; ram: '.$ram.'; hdd: '.$item['pkg_vm_disk'].')',
+				'id' => $item['id'],
+				'description' => $item['description']
+			];
 		}
-		return ['html' => $html, 'min_id' => $min_id];
+		return [$html, $min_id];
 	}
 
 }

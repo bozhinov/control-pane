@@ -1,5 +1,11 @@
 <?php
 
+//case 'usersAdd':		echo json_encode($this->usersAdd()); return;
+//case 'usersEdit':		echo json_encode($this->usersEdit()); return;
+//case 'userRemove':		echo json_encode($this->userRemove()); return;
+//case 'userGetInfo':		echo json_encode($this->userGetInfo()); return;
+//case 'userEditInfo':		echo json_encode($this->userEditInfo()); return;
+
 class Auth {
 
 	public $authorized = false; # TODO Move to SESSION

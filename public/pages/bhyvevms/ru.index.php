@@ -1,6 +1,9 @@
 <?php
 $tpl->draw('dialogs\vnc-bhyve');
 $tpl->assign("media_iso_list", $this->media_iso_list());
+list($vm_res, $min_id) = $this->vm_packages_list();
+$tpl->assign("vm_res", $vm_res);
+$tpl->assign("min_id", $min_id);
 $tpl->draw('dialogs\bhyve-new');
 $tpl->assign("authkeys_list", $this->authkeys_list());
 $tpl->draw('dialogs\bhyve-obtain');
