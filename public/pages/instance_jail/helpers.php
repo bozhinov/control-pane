@@ -2,32 +2,30 @@
 
 require_once("../php/cbsd.php");
 
-$hash=$this->url_hash;	//=preg_replace('/^#/','',$this->_vars['hash']);
+$hash = $this->url_hash;
  
-$db_path=false;
-if(!isset($this->_vars['db_path']))
-{
-	//$db_path=$this->_vars['db_path'];
-	$res=CBSD::run('make_tmp_helper module=%s', [$hash]);
-	if($res['retval']==0){
-		$db_path=$res['message'];
-	}else{
-		echo json_encode(array('error'=>true,'errorMessage'=>'Error on open temporary form database!'));
+$db_path = false;
+if(!isset($this->_vars['db_path'])){
+	$res = CBSD::run('make_tmp_helper module=%s', [$hash]);
+	if($res['retval'] == 0){
+		$db_path = $res['message'];
+	} else {
+		echo json_encode(['error' => true, 'errorMessage' => 'Error on open temporary form database!']);
 		return;
 	}
-}else{
-	$db_path=$this->_vars['db_path'];
+} else {
+	$db_path = $this->_vars['db_path'];
 }
 
-$freejname='';
-$jres=$this->getFreeJname(true);
-if(!$jres['error']) $freejname=$jres['freejname'];
+$freejname = '';
+$jres = $this->getFreeJname(true);
+if(!$jres['error']) $freejname = $jres['freejname'];
 
-$jname_desc=$this->translate('will be created new jail with helper inside');
-$jail_sett=$this->translate('Jail Settings');
-$jail_name=$this->translate('Jail name');
-$ip_address=$this->translate('IP address');
-$html=<<<EOT
+$jname_desc = $tpl->translate('will be created new jail with helper inside');
+$jail_sett = $tpl->translate('Jail Settings');
+$jail_name = $tpl->translate('Jail name');
+$ip_address = $tpl->translate('IP address');
+$html = <<<EOT
 	<form class="win" method="post" id="newJailSettings" onsubmit="return false;">
 		<div class="form-fields">
 			<h1>{$jail_sett} <small>({$jname_desc})</small></h1>
@@ -43,7 +41,7 @@ $html=<<<EOT
 	</form>
 EOT;
 
-$res_html=(new Forms('',$hash,$db_path))->generate();
-$html.='<h1>Helper: '.$hash.'</h1>'.$res_html;
+$res_html = (new Forms('', $hash, $db_path))->generate();
+$html .= '<h1>Helper: '.$hash.'</h1>'.$res_html;
 
-echo json_encode(array('html'=>$html,'func'=>'fillTab'));
+echo json_encode(['html' => $html, 'func' => 'fillTab']);

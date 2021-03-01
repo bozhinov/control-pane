@@ -6,11 +6,11 @@ if(!empty($jail_name)){
 	return;
 }
 
-$html='';
-
+$html = '';
 $db = new Db('base','nodes');
 $res = $db->select('select nodename from nodelist', []);
 $nodes = ['local'];
+
 foreach($res as $val){
 	$nodes[] = $val['nodename'];
 }

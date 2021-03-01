@@ -46,7 +46,7 @@ if(empty($hash)){
 				'logo' => $logo,
 				'name' => $item['helper'],
 				'description' => $item['description'],
-				'opentitle' => $this->translate('Open')
+				'opentitle' => $tpl->translate('Open')
 			];
 
 			foreach($vars as $var => $val){

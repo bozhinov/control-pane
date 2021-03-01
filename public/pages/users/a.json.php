@@ -14,23 +14,23 @@ date_joined TIMESTAMP DATE DEFAULT (datetime('now','localtime'))
 
 $res = Auth::json_usersGetInfo();
 $html = '';
-$nth=0;
+$nth = 0;
 # TODO: refactor this with Tpl
-$hres = $this->getTableChunk('users','tbody');
+$hres = $this->getTableChunk('users', 'tbody');
 
 foreach($res as $r){
 
-	$vars = array(
+	$vars = [
 		'id' => $r['id'],
 		'login' => $r['username'],
 		'first_name' => $r['first_name'],
 		'last_name' => $r['last_name'],
 		'date_joined' => $r['date_joined'],
 		'last_login' => $r['last_login'],
-		'is_active' => ($r['is_active']==1)?'icon-ok':'',
+		'is_active' => ($r['is_active']==1) ? 'icon-ok' : '',
 		'edit_title' => $this->translate('edit_title'),
-		'delete_title' => $this->translate('delete_title'),
-	);
+		'delete_title' => $this->translate('delete_title')
+	];
 
 	$html_tpl1 = $hres[1];
 	foreach($vars as $var => $val){
