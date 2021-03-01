@@ -47,9 +47,8 @@ class Auth {
 			}
 
 			$new_array = []; # TODO: Fix this mess
-			$cfunc='ccmd_'.$this->mode;
+			$cfunc = 'ccmd_'.$this->mode;
 			if(method_exists($this, $cfunc)){
-				$ccmd_res = [];
 				$ccmd_res = $this->$cfunc();
 				
 				if(is_array($ccmd_res)){
@@ -64,7 +63,6 @@ class Auth {
 		}
 	}
 
-	/* example return array('message'=>'unregistered user','errorCode'=>1) */
 	function ccmd_login()
 	{
 		return $this->userRegisterCheck($this->form);
@@ -94,8 +92,8 @@ class Auth {
 				$pass = $this->getPasswordHash($user_info['password']);
 				$res = $db->selectOne("SELECT id,username,password FROM auth_user WHERE username=? AND is_active=1", array([$user_info['login']]));
 				if(empty($res) || $res['password'] != $pass){
-					sleep(3);
-					return ['errorCode'=>1,'message'=>'user not found!'];
+					//sleep(3); # TODO Why?
+					return ['errorCode' => 1,'message' => 'user not found!'];
 				}
 				$res['errorCode']=0;
 
@@ -112,7 +110,7 @@ class Auth {
 					[$id],
 					[$this->_client_ip]
 				]);
-				//print_r($qres);
+
 				if(isset($qres['rowCount'])){
 					if($qres['rowCount'] == 0){
 						$query = "INSERT INTO auth_list
@@ -153,7 +151,7 @@ class Auth {
 				$query = $db->query_protect("INSERT INTO auth_user
 					(username,password,first_name,last_name,is_active,date_joined) VALUES
 					(?,?,?,?,?,datetime('now','localtime'))");
-				$res=$db->insert($query, [
+				$res = $db->insert($query, [
 					[$user_info['username']],
 					[$password],
 					[$user_info['first_name']],
@@ -200,10 +198,10 @@ class Auth {
 		$form = $this->form;
 
 		if(!isset($form['user_id']) || !is_numeric($form['user_id']) || $form['user_id']<1){
-			return ['error' => true,'error_message'=>'incorrect data!'];
+			return ['error' => true,'error_message' => 'incorrect data!'];
 		}
 		$db = new Db('clonos');
-		if(!$db->isConnected())	return ['error' => true,'error_message' => 'db connection lost!'];
+		if(!$db->isConnected())	return ['error' => true, 'error_message' => 'db connection lost!'];
 
 		$user_id = (int)$form['user_id'];
 		$username = $form['username'];
@@ -224,33 +222,33 @@ class Auth {
 				return ['error' => true, 'error_message' => 'you are still not authorized'];
 			}
 		} else {
-			return ['error' => true, 'error_message'=>'you must be authorized for this operation!'];
+			return ['error' => true, 'error_message' => 'you must be authorized for this operation!'];
 		}
 
 		if($user_id == 0 || $user_id != $authorized_user_id){
-			return ['error' => true,'error_message'=>'I think you\'re some kind of hacker'];
+			return ['error' => true, 'error_message' => 'I think you\'re some kind of hacker'];
 		}
 
 		if(isset($form['password'])){
 			$password = $this->getPasswordHash($form['password']);
 			$query = "UPDATE auth_user SET username=?,password=?,first_name=?,last_name=?,is_active=? WHERE id=?";
-			$res = $db->update($query, array(
+			$res = $db->update($query, [
 				[$username],
 				[$password],
 				[$first_name],
 				[$last_name],
 				[$is_active],
 				[(int)$user_id]
-			));
+			]);
 		} else {
 			$query = "UPDATE auth_user SET username=?,first_name=?,last_name=?,is_active=? WHERE id=?";
-			$res = $db->update($query, array(
+			$res = $db->update($query, [
 				[$username],
 				[$first_name],
 				[$last_name],
 				[$is_active],
 				[(int)$user_id]
-			));
+			]);
 		}
 		return ['error' => false, 'res' => $res];
 	}
@@ -262,7 +260,7 @@ class Auth {
 		$res = $this->userRegister($form);
 		if($res !== false){
 			if(isset($res['user_exists']) && $res['user_exists']){
-				return array('error' => true, 'errorType'=>'user-exists', 'errorMessage' => 'User always exists!');
+				return ['error' => true, 'errorType' => 'user-exists', 'errorMessage' => 'User always exists!'];
 			}
 			return $res;
 		}
@@ -273,18 +271,17 @@ class Auth {
 	{
 		$id = $this->form['user_id'];
 		if(is_numeric($id) && $id > 0){
-			$query = "DELETE FROM auth_user WHERE id=?";
 			$db = new Db('clonos');
-			if(!$db->isConnected()) return ['error' => true,'error_message' => 'DB connection error!'];
+			if(!$db->isConnected()) return ['error' => true, 'error_message' => 'DB connection error!'];
 
-			$res = $db->select($query, array([(int)$id, PDO::PARAM_INT]));
+			$res = $db->select("DELETE FROM auth_user WHERE id=?", array([(int)$id, PDO::PARAM_INT]));
 			return $res;
 		}
 	}
 
 	function ccmd_userEditInfo()
 	{
-		if(!isset($this->form['user_id'])) return ['error'=>true,'error_message'=>'incorrect data!'];
+		if(!isset($this->form['user_id'])) return ['error' => true, 'error_message' => 'incorrect data!'];
 
 		$db = new Db('clonos');
 		if(!$db->isConnected()) return ['error' => true, 'error_message' => 'DB connection error!'];
@@ -315,7 +312,7 @@ class Auth {
 		if($db->isConnected()){
 			$res = $db->select("select id,username,first_name,last_name,date_joined,last_login,is_active from auth_user order by date_joined desc", []);
 		} else {
-			return ['error' => true,'error_message' => 'DB connection error!'];
+			return ['error' => true, 'error_message' => 'DB connection error!'];
 		}
 		return $res;
 	}

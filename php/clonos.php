@@ -95,8 +95,7 @@ class ClonOS
 			// functions, running without parameters
 			$new_array = []; # TODO: Fix this mess
 			$cfunc = 'ccmd_'.$this->mode;
-			if(method_exists($this,$cfunc)){
-				$ccmd_res = [];
+			if(method_exists($this, $cfunc)){
 				$ccmd_res = $this->$cfunc();
 				
 				if(is_array($ccmd_res)){
@@ -141,8 +140,8 @@ class ClonOS
 				//case 'jailRemove':		echo json_encode($this->jailRemove()); return;
 				//case 'saveJailHelperValues':	echo json_encode($this->saveJailHelperValues()); return;
 
-				case 'saveHelperValues':	$redirect='/jailscontainers/';
-				case 'jailAdd': 		if(!isset($redirect)) $redirect=''; echo json_encode($this->jailAdd($redirect)); return;
+				case 'saveHelperValues':	$redirect = '/jailscontainers/';
+				case 'jailAdd': 		if(!isset($redirect)) $redirect = ''; echo json_encode($this->jailAdd($redirect)); return;
 
 				//case 'jailClone':		echo json_encode($this->jailClone()); return;
 				//case 'jailRename':		echo json_encode($this->jailRename()); return;
@@ -253,7 +252,7 @@ class ClonOS
 
 	function check_vmonline($vm)
 	{
-		$vmmdir="/dev/vmm";
+		$vmmdir = "/dev/vmm";
 
 		if(file_exists($vmmdir)){
 			if($handle = opendir($vmmdir)){
@@ -274,9 +273,9 @@ class ClonOS
 	function get_node_info($nodename, $value)
 	{
 		$db = new Db('', '', $this->realpath."/var/db/nodes.sqlite"); 
-		if (!$db->isConnected()) return ['error'=>true, 'res'=> $db->error_message];
+		if (!$db->isConnected()) return ['error' => true, 'res' => $db->error_message];
 
-		$result = $db->select("SELECT ? FROM nodelist WHERE nodename=?", array([$value],[$nodename]));
+		$result = $db->select("SELECT ? FROM nodelist WHERE nodename=?", array([$value], [$nodename]));
 
 		foreach($result as $res){
 			if(isset($res[$value])){
@@ -321,7 +320,7 @@ class ClonOS
 			foreach($tasks as $task){
 				$rid = preg_replace('/^#/','',$task['jname']);
 				foreach($check_arr as $key => $val){
-					if(strpos($task['cmd'],$key) !== false){
+					if(strpos($task['cmd'], $key) !== false){
 						$cmd = $key;
 						$txt_status = $val;
 						break;
@@ -342,7 +341,7 @@ class ClonOS
 	{
 		$query = 'SELECT * FROM projects';
 		$res = $this->_db->select($query, []);
-		echo '	var projects=', json_encode($res), PHP_EOL;
+		echo '	var projects = ', json_encode($res), PHP_EOL;
 	}
 */
 
