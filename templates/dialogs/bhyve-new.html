@@ -16,7 +16,13 @@ err_messages.add({
 			<p class="new">
 				<span class="field-name">{translate::('VM OS profile')}:</span>
 				<select name="vm_os_profile">
-<?php echo $this->os_types_create(); ?> <!-- TODO -->
+					{loop="$os_types"}
+						<optgroup label="{$value.os}">
+							{loop="$value.items"}
+								<option value="{$key}.{key1}">{$value1.name}</option>
+							{/loop}
+						</optgroup>
+					{/loop}
 				</select>
 			</p>
 			<p>

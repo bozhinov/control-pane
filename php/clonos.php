@@ -2558,27 +2558,6 @@ class ClonOS {
 
 	function os_types_create($obtain = 'new')
 	{
-		$obtain = ($obtain == 'obtain');
-		if($obtain){
-			$info = $this->config->os_types_obtain;
-		} else {
-			$info = $this->config->os_types;
-		}
-
-		$html = '';
-		foreach($info as $num1 => $os)
-		{
-			$obtain_count = 0;
-			$html_tmp = '					<optgroup label="'.$os['os'].'">'.PHP_EOL;
-			$items = $os['items'];
-			foreach($items as $num2 => $item)
-			{
-					$html_tmp .= '						<option value="'.$num1.'.'.$num2.'">'.$item['name'].'</option>'.PHP_EOL;
-			}
-			$html_tmp .= '					</optgroup>'.PHP_EOL;
-			
-			$html. = $html_tmp;
-		}
-		return $html;
+		return ($obtain == 'obtain') ? $this->config->os_types_obtain : $this->config->os_types;
 	}
 }

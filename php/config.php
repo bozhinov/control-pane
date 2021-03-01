@@ -127,12 +127,7 @@ class Config
 		[
 			'os' => 'DragonflyBSD',
 			'items' => [
-				[
-					'name' => 'DragonflyBSD 4',
-					'type' => 'dflybsd',
-					'profile' => 'x86-4',
-					'obtain' => false
-				]
+				['name' => 'DragonflyBSD 4', 'type' => 'dflybsd', 'profile' => 'x86-4', 'obtain' => false]
 			]
 		],
 		[
