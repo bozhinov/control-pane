@@ -169,7 +169,7 @@ class Auth {
 			$db = new Db('clonos');
 			if($db->isConnected()){
 				$query = "SELECT au.id,au.username FROM auth_user au, auth_list al WHERE al.secure_sess_id=? AND au.id=al.user_id AND au.is_active=1";
-				$res = $db->selectOne($query, array([md5($_COOKIE['mhash'].$this->_client_ip);]));
+				$res = $db->selectOne($query, array([md5($_COOKIE['mhash'].$this->_client_ip)]));
 				if(!empty($res)){
 					$res['error'] = false;
 					return $res;
@@ -181,7 +181,7 @@ class Auth {
 
 	function getPasswordHash($password)
 	{
-		return hash('sha256', hash('sha256', $password).$this->getSalt());
+		return hash('sha256', hash('sha256', $password) . $this->getSalt());
 	}
 
 	private function getSalt()
@@ -195,7 +195,7 @@ class Auth {
 	{
 		$form = $this->form;
 
-		if(!isset($form['user_id']) || !is_numeric($form['user_id']) || $form['user_id']<1){
+		if(!isset($form['user_id']) || !is_numeric($form['user_id']) || $form['user_id'] < 1){
 			return ['error' => true,'error_message' => 'incorrect data!'];
 		}
 		$db = new Db('clonos');
@@ -214,7 +214,7 @@ class Auth {
 			if(!preg_match('#^[a-f0-9]{32}$#', $mhash)) return ['error' => true,'error_message' => 'Bad data'];
 			$query1 = "select user_id from auth_list WHERE sess_id=? limit 1";
 			$res1 = $db->selectOne($query1, array([$mhash]));
-			if($res1['user_id']>0){
+			if($res1['user_id'] > 0){
 				$authorized_user_id = $res1['user_id'];
 			} else {
 				return ['error' => true, 'error_message' => 'you are still not authorized'];
