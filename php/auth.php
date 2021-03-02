@@ -68,7 +68,7 @@ class Auth {
 		return $this->userRegisterCheck($this->form);
 	}
 
-	function userRegisterCheck($user_info=[])
+	function userRegisterCheck($user_info = [])
 	{
 		/*
 		[0] => Array
@@ -95,7 +95,7 @@ class Auth {
 					//sleep(3); # TODO Why?
 					return ['errorCode' => 1,'message' => 'user not found!'];
 				}
-				$res['errorCode']=0;
+				$res['errorCode'] = 0;
 
 				$id = (int)$res['id'];
 				$memory_hash = md5($id.$res['username'].time());
@@ -130,10 +130,10 @@ class Auth {
 				return $res;
 			}
 		}
-		return ['message' => 'unregistered user','errorCode' => 1];
+		return ['message' => 'unregistered user', 'errorCode' => 1];
 	}
 
-	function userRegister($user_info=[])
+	function userRegister($user_info = [])
 	{
 		if(empty($user_info)) return false;
 		if(isset($user_info['username']) && isset($user_info['password'])){
@@ -148,10 +148,10 @@ class Auth {
 				$password = $this->getPasswordHash($user_info['password']);
 				$is_active = 0;
 				if(isset($user_info['actuser']) && $user_info['actuser'] == 'on') $is_active = 1;
-				$query = $db->query_protect("INSERT INTO auth_user
+				$query = "INSERT INTO auth_user
 					(username,password,first_name,last_name,is_active,date_joined) VALUES
-					(?,?,?,?,?,datetime('now','localtime'))");
-				$res = $db->insert($query, [
+					(?,?,?,?,?,datetime('now','localtime'))";
+				$res = $db->update($query, [
 					[$user_info['username']],
 					[$password],
 					[$user_info['first_name']],
@@ -166,12 +166,10 @@ class Auth {
 	function userAutologin()
 	{
 		if(isset($_COOKIE['mhash'])){
-			$memory_hash = $_COOKIE['mhash'];
-			$secure_memory_hash = md5($memory_hash.$this->_client_ip);
 			$db = new Db('clonos');
 			if($db->isConnected()){
 				$query = "SELECT au.id,au.username FROM auth_user au, auth_list al WHERE al.secure_sess_id=? AND au.id=al.user_id AND au.is_active=1";
-				$res = $db->selectOne($query, array([$secure_memory_hash]));
+				$res = $db->selectOne($query, array([md5($_COOKIE['mhash'].$this->_client_ip);]));
 				if(!empty($res)){
 					$res['error'] = false;
 					return $res;
