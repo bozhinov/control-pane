@@ -136,15 +136,20 @@ class Forms
 		$tpl = '';
 		switch(trim($el)){
 			case 'inputbox':
-				$res = $this->getInputAutofill($arr);
-				if($res === false){
-					$list = '';
-					$datalist = '';
+				if(isset($arr['link'])){
+					$id = $arr['link'];
+					$tpl .= '<datalist id="'.$id.'">';
+					$opts = $this->fetch_from_db($arr['link']);
+					foreach($opts as $key => $opt){
+						$tpl .= '<option>'.$opt['text'].'</option>';
+					}
+					$tpl .= '</datalist>';
+					$list = ' list="'.$id.'"';
 				} else {
-					$list = ' list="'.$res['list'].'"';
-					$datalist = $res['datalist'];
+					$tpl = '';
+					$list = '';
 				}
-				$tpl = '<div class="form-field"><input type="text" name="${param}" value="${value}" ${attr}${required}'.$list.' /><span class="default val-${def}" title="Click to fill dafault value">[default]</span><span class="small">${desc}</span>'.$datalist.'</div>';
+				$tpl = '<div class="form-field"><input type="text" name="${param}" value="${value}" ${attr}${required}'.$list.' /><span class="default val-${def}" title="Click to fill dafault value">[default]</span><span class="small">${desc}</span>'.$tpl.'</div>';
 				//'.$default.'
 				break;
 			case 'password':
@@ -157,57 +162,31 @@ class Forms
 				$tpl = '<input type="checkbox" id="chk-${idx}" name="${param}" /><label for="chk-${idx}">${desc}</label>';
 				break;
 			case 'select':
-				$tpl = $this->getSelect($el, $arr);
+				$tpl = '<div class="form-field"><select name="${param}">';
+				if(isset($arr['link'])){
+					$opts = $this->fetch_from_db($arr['link']);
+					// Пустое поле в списках оказалось ненужным!
+					//array_unshift($opts,array('id'=>0,'text'=>'','order_id'=>-1));
+					foreach($opts as $key => $opt){
+						$selected = ($opt['id'] == $arr['cur']) ? ' selected' : '';
+						$tpl .= '<option value="'.$opt['id'].'"'.$selected.'>'.$opt['text'].'</option>';
+					}
+				}
+				$tpl .= '</select><span class="default val-${def}" title="Click to fill dafault value">[default]</span><span class="small">${desc}</span></div>';
 				break;
 			case 'radio':
-				$tpl = $this->getRadio($el, $arr);
+				$tpl = '<div class="form-field"><fieldset><legend>${desc}</legend>';
+				if(isset($arr['link'])){
+					$opts = $this->fetch_from_db($arr['link']);
+					foreach($opts as $key => $opt){
+						$checked = ($opt['id'] == $arr['cur']) ? ' checked' : '';
+						$tpl .= '<label for="${param}-'.$opt['id'].'">'.$opt['text'].':</label><input type="radio" name="${param}" value="'.$opt['id'].'" id="${param}-'.$opt['id'].'"'.$checked.' />';
+					}
+				}
+				$tpl =.'</fieldset></div>';
 				break;
 		}
 		return $tpl;
-	}
-
-	function getInputAutofill($arr)
-	{
-		if(isset($arr['link'])){
-			$id = $arr['link'];
-			$tpl = '<datalist id="'.$id.'">';
-			$opts = $this->fetch_from_db($arr['link']);
-			foreach($opts as $key => $opt){
-				$tpl .= '<option>'.$opt['text'].'</option>';
-			}
-			$tpl .= '</datalist>';
-			return ['list' => $id, 'datalist' => $tpl];
-		} else {
-			return false;
-		}
-	}
-
-	function getSelect($el, $arr)
-	{
-		$tpl = '<div class="form-field"><select name="${param}">';
-		if(isset($arr['link'])){
-			$opts = $this->fetch_from_db($arr['link']);
-			// Пустое поле в списках оказалось ненужным!
-			//array_unshift($opts,array('id'=>0,'text'=>'','order_id'=>-1));
-			foreach($opts as $key => $opt){
-				$selected = ($opt['id'] == $arr['cur']) ? ' selected' : '';
-				$tpl .= '<option value="'.$opt['id'].'"'.$selected.'>'.$opt['text'].'</option>';
-			}
-		}
-		return $tpl.'</select><span class="default val-${def}" title="Click to fill dafault value">[default]</span><span class="small">${desc}</span></div>';
-	}
-
-	function getRadio($el, $arr)
-	{
-		$tpl = '<div class="form-field"><fieldset><legend>${desc}</legend>';
-		if(isset($arr['link'])){
-			$opts = $this->fetch_from_db($arr['link']);
-			foreach($opts as $key => $opt){
-				$checked = ($opt['id'] == $arr['cur']) ? ' checked' : '';
-				$tpl .= '<label for="${param}-'.$opt['id'].'">'.$opt['text'].':</label><input type="radio" name="${param}" value="'.$opt['id'].'" id="${param}-'.$opt['id'].'"'.$checked.' />';
-			}
-		}
-		return $tpl.'</fieldset></div>';
 	}
 
 }
