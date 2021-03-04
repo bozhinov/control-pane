@@ -198,7 +198,7 @@ class Forms
 						<input type="radio" name="${param}" value="'.$opt['id'].'" id="${param}-'.$opt['id'].'"'.$checked.' />';
 					}
 				}
-				$tpl =.'</fieldset></div>';
+				$tpl .='</fieldset></div>';
 				break;
 		}
 		return $tpl;

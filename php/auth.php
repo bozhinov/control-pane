@@ -20,7 +20,7 @@ class Auth {
 	function __construct()
 	{
 		$this->_client_ip = $_SERVER['REMOTE_ADDR'];
-		$this->form = (isset($_POST['form_data'])) : $_POST['form_data'] : [];
+		$this->form = (isset($_POST['form_data'])) ? $_POST['form_data'] : [];
 		$ures = $this->userAutologin();
 		if($ures !== false){
 			if(isset($ures['id']) && is_numeric($ures['id']) && $ures['id'] > 0){

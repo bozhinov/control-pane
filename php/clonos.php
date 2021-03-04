@@ -1154,7 +1154,7 @@ class ClonOS
 		if($res !== false && !empty($res)){
 			CBSD::run(
 				'cbsd media mode=unregister name="%s" path="%s" jname=%s type=%s',
-				[($res['name'], $res['path'], $jname, $res['type']]
+				[$res['name'], $res['path'], $jname, $res['type']]
 			);
 			$res = $db->selectOne(
 				'SELECT * FROM media WHERE idx=?',
@@ -1292,7 +1292,7 @@ class ClonOS
 			'jail_id' => $jid,
 			'taskId' => $taskId,
 			'html' => $html,
-			'mode' = >$this->mode
+			'mode' => $this->mode
 		];
 	}
 
@@ -1387,7 +1387,7 @@ class ClonOS
 				'reboot_title' => $this->_locale->translate('Restart VM')
 			];
 
-			foreach($vars as $var = >$val){
+			foreach($vars as $var => $val){
 				$html_tpl = str_replace('#'.$var.'#', $val, $html_tpl);
 			}
 			$html = $html_tpl;
@@ -1521,7 +1521,7 @@ class ClonOS
 		if(!$db->isConnected()) return ['error' => true, 'res' => 'Database error'];
 
 		$res = $db->selectOne('SELECT * FROM media WHERE idx=?', array([(int)$this->form['media_id'], PDO::PARAM_INT]));
-		if($res === false || empty($res)) return ['error' => true, 'res'= >print_r($res, true)];
+		if($res === false || empty($res)) return ['error' => true, 'res'=> print_r($res, true)];
 
 		$res = CBSD::run(
 			'media mode=remove name="%s" path="%s" jname="%s" type="%s"', //.$res['name']
