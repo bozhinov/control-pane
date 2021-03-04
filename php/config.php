@@ -158,7 +158,7 @@ class Config
 	];
 
 	public $os_types_obtain = [];
-	public $os_interfaces = [];
+	public $os_interface_names = [];
 
 	function __construct()
 	{
@@ -173,9 +173,16 @@ class Config
 		}
 
 		$res2 = CBSD::run('cbsd get_interfaces', []);
+		$list = [];
 		if($res2['retval'] == 0){
-			$this->os_interfaces = $this->create_interfaces($res2);
+			$res = json_decode($info['message'], true);
+			if(!is_null($res) && $res != false){
+				foreach($res as $item){
+					$list[] = $item['name'];
+				}
+			}
 		}
+		$this->os_interface_names = $list;
 	}
 
 	function create_bhyve_profiles($info)
@@ -193,15 +200,5 @@ class Config
 			}
 		}
 		return $os_names;
-	}
-
-	function create_interfaces($info)
-	{
-		$res = json_decode($info['message'], true);
-		if(!is_null($res) && $res != false){
-			return $res;
-		} else {
-			return [];
-		}
 	}
 }

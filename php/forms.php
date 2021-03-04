@@ -124,9 +124,12 @@ class Forms
 			}
 		}
 
-		$html .= '</div>';
-		$html .= '<div class="buttons"><input type="button" value="Apply" class="save-helper-values" title="Save and apply params" /> &nbsp; <input type="button" value="Clear" class="clear-helper" title="Restore loaded params" /></div>';
-		$html .= '</form>';
+		$html .= '</div>
+		<div class="buttons">
+		<input type="button" value="Apply" class="save-helper-values" title="Save and apply params" /> &nbsp; 
+		<input type="button" value="Clear" class="clear-helper" title="Restore loaded params" />
+		</div>
+		</form>';
 
 		return $html;
 	}
@@ -138,9 +141,9 @@ class Forms
 			case 'inputbox':
 				if(isset($arr['link'])){
 					$id = $arr['link'];
-					$tpl .= '<datalist id="'.$id.'">';
+					$tpl = '<datalist id="'.$id.'">';
 					$opts = $this->fetch_from_db($arr['link']);
-					foreach($opts as $key => $opt){
+					foreach($opts as $opt){
 						$tpl .= '<option>'.$opt['text'].'</option>';
 					}
 					$tpl .= '</datalist>';
@@ -149,17 +152,25 @@ class Forms
 					$tpl = '';
 					$list = '';
 				}
-				$tpl = '<div class="form-field"><input type="text" name="${param}" value="${value}" ${attr}${required}'.$list.' /><span class="default val-${def}" title="Click to fill dafault value">[default]</span><span class="small">${desc}</span>'.$tpl.'</div>';
-				//'.$default.'
+				$tpl = '<div class="form-field">
+				<input type="text" name="${param}" value="${value}" ${attr}${required}'.$list.' />
+				<span class="default val-${def}" title="Click to fill dafault value">[default]</span>
+				<span class="small">${desc}</span>'.$tpl.'
+				</div>';
 				break;
 			case 'password':
-				$tpl = '<div class="form-field"><input type="password" name="${param}" value="${value}" ${attr}${required} /><span class="default val-${def}" title="Click to fill dafault value">[default]</span><span class="small">${desc}</span></div>';
+				$tpl = '<div class="form-field">
+				<input type="password" name="${param}" value="${value}" ${attr}${required} />
+				<span class="default val-${def}" title="Click to fill dafault value">[default]</span>
+				<span class="small">${desc}</span>
+				</div>';
 				break;
 			case 'delimer':
 				$tpl = '<h1>${desc}</h1>';
 				break;
 			case 'checkbox':
-				$tpl = '<input type="checkbox" id="chk-${idx}" name="${param}" /><label for="chk-${idx}">${desc}</label>';
+				$tpl = '<input type="checkbox" id="chk-${idx}" name="${param}" />
+				<label for="chk-${idx}">${desc}</label>';
 				break;
 			case 'select':
 				$tpl = '<div class="form-field"><select name="${param}">';
@@ -172,7 +183,10 @@ class Forms
 						$tpl .= '<option value="'.$opt['id'].'"'.$selected.'>'.$opt['text'].'</option>';
 					}
 				}
-				$tpl .= '</select><span class="default val-${def}" title="Click to fill dafault value">[default]</span><span class="small">${desc}</span></div>';
+				$tpl .= '</select>
+				<span class="default val-${def}" title="Click to fill dafault value">[default]</span>
+				<span class="small">${desc}</span>
+				</div>';
 				break;
 			case 'radio':
 				$tpl = '<div class="form-field"><fieldset><legend>${desc}</legend>';
@@ -180,7 +194,8 @@ class Forms
 					$opts = $this->fetch_from_db($arr['link']);
 					foreach($opts as $key => $opt){
 						$checked = ($opt['id'] == $arr['cur']) ? ' checked' : '';
-						$tpl .= '<label for="${param}-'.$opt['id'].'">'.$opt['text'].':</label><input type="radio" name="${param}" value="'.$opt['id'].'" id="${param}-'.$opt['id'].'"'.$checked.' />';
+						$tpl .= '<label for="${param}-'.$opt['id'].'">'.$opt['text'].':</label>
+						<input type="radio" name="${param}" value="'.$opt['id'].'" id="${param}-'.$opt['id'].'"'.$checked.' />';
 					}
 				}
 				$tpl =.'</fieldset></div>';
