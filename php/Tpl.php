@@ -70,19 +70,19 @@ class Tpl {
 		extract($this->vars);
 		ob_start();
 
-		$fileName = basename($filePath);
-		$filePathCached = $this->config['cache_dir'] . $fileName . ".stpl.php";
+		#$fileName = basename($filePath); TODO: FIX
+		$filePathCached = $this->config['cache_dir'] . $filePath . ".stpl.php";
 
 		if (!$this->config['production_ready']){ # in case all is already cached
 			// set paths
-			$filePath = $this->config['tpl_dir'] . $fileName . '.html';
+			$filePath = $this->config['tpl_dir'] . $filePath . '.html';
 			// The results of this function are cached
 			$fileTime = (int)@filemtime($filePath);
 			$fileTimeCached = (int)@filemtime($filePathCached);
 
 			// Check if template exists (although there are other reasons for this to be false)
 			if ($fileTime == 0) {
-				die('Template ' . $fileName . ' not found!');
+				die('Template ' . $filePath . ' not found!');
 			}
 
 			// Compile the template if the original has been updated 

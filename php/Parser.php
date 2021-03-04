@@ -1,7 +1,7 @@
 <?php
 
 /**
-*  TPL 1.0 - a RainTpl fork
+*  TPL 1.1 - a RainTpl fork
 *  --------
 *  maintained by Momchil Bozhinov (momchil@bojinov.info)
 */
@@ -38,7 +38,7 @@ class Parser {
 		'ternary' => ['({.[^{?}]*?\?.*?\:.*?})', '/{(.[^{?}]*?)\?(.*?)\:(.*?)}/'],
 		'variable' => ['({\$.*?})', '/{(\$.*?)}/'],
 		'constant' => ['({#.*?})', '/{#(.*?)#{0,1}}/'],
-		'translate' => ['({translate})', '/{translate::(.*)}/']
+		'translate' => ['({translate})', '/{translate::(.*?)}/']
 	);
 
 	function __construct($config)

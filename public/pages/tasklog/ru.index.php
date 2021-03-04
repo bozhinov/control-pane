@@ -1,5 +1,5 @@
 <?php
-$tpl->draw('dialogs\tasklog');
+$tpl->draw('dialogs/tasklog');
 ?>
 <h1>Логи задач</h1>
 

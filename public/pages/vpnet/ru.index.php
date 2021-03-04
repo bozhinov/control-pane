@@ -1,5 +1,5 @@
 <?php
-$tpl->draw('dialogs\vpnet');
+$tpl->draw('dialogs/vpnet');
 ?>
 <h1>Список подсетей</h1>
 

@@ -1,5 +1,5 @@
 <?php
-$tpl->draw('dialogs\authkey');
+$tpl->draw('dialogs/authkey');
 ?>
 <h1>Список ключей авторизации</h1>
 

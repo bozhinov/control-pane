@@ -8,7 +8,7 @@ $nodes = array_reverse($nodes);
 
 $ids = [];
 $nth = 0;
-$hres = $this->getTableChunk('baseslist','tbody');
+$hres = $clonos->getTableChunk('baseslist','tbody');
 foreach($nodes as $node){
 	$db1 = new Db('base',$node['nodename']);
 	if($db1 !== false){
@@ -17,7 +17,7 @@ foreach($nodes as $node){
 		foreach($bases as $base){
 			$idle = 1;
 			if($node['nodename'] != 'local'){
-				$idle = $this->check_locktime($node['ip']);
+				$idle = $clonos->check_locktime($node['ip']);
 			}
 
 			$ids[] = $base['idx'];
@@ -58,7 +58,7 @@ foreach($nodes as $node){
 $html = str_replace(["\n","\r","\t"], '', $html);
 $tasks = '';
 if(!empty($ids)){
-	$tasks = $this->getRunningTasks($ids);
+	$tasks = $clonos->getRunningTasks($ids);
 }
 
 $html_tpl = str_replace(["\n","\r","\t"], '', $hres[1]);

@@ -12,7 +12,7 @@ $statuses = ['Not Launched','Launched','unknown-1','Maintenance','unknown-3','un
 $allnodes = [];
 $jail_ids = [];
 $nth = 0;
-$hres = $this->getTableChunk('bhyveslist','tbody');
+$hres = $clonos->getTableChunk('bhyveslist','tbody');
 
 foreach($nodes as $node){
 	$db1 = new Db('base', $node);
@@ -23,19 +23,19 @@ foreach($nodes as $node){
 		foreach($bhyves as $bhyve){
 			if($hres !== false){
 				$html_tpl = $hres[1];
-				$status = $this->check_vmonline($bhyve['jname']);
+				$status = $clonos->check_vmonline($bhyve['jname']);
 				$jname = $bhyve['jname'];
 				$vnc_port_status = 'grey';
 				$vnc_ip = $bhyve['bhyve_vnc_tcp_bind'];
 				if($status == 1){
-					$vnc_port_file = $this->workdir.'/jails-system/'.$jname.'/vnc_port';
+					$vnc_port_file = $clonos->workdir.'/jails-system/'.$jname.'/vnc_port';
 					if(file_exists($vnc_port_file)){
 						$vnc_port = trim(file_get_contents($vnc_port_file));
 					}
 				} else {
 					$vnc_port = '';
 				}
-				if($vnc_ip!='127.0.0.1') $vnc_port_status = 'black';
+				if($vnc_ip != '127.0.0.1') $vnc_port_status = 'black';
 
 				$vars = [
 					'jname' => $bhyve['jname'],
@@ -44,7 +44,7 @@ foreach($nodes as $node){
 					'maintenance' => '',
 					'node' => $node,
 					'vm_name' => '',
-					'vm_ram' => $this->fileSizeConvert($bhyve['vm_ram']),
+					'vm_ram' => $clonos->fileSizeConvert($bhyve['vm_ram']),
 					'vm_cpus' => $bhyve['vm_cpus'],
 					'vm_os_type' => $bhyve['vm_os_type'],
 					'vm_status' => $tpl->translate($statuses[$status]),
@@ -61,8 +61,8 @@ foreach($nodes as $node){
 					'vnc_port_status' => $vnc_port_status
 				];
 
-				foreach($vars as $var=>$val){
-					$html_tpl=str_replace('#'.$var.'#',$val,$html_tpl);
+				foreach($vars as $var => $val){
+					$html_tpl = str_replace('#'.$var.'#', $val, $html_tpl);
 				}
 				if($node != 'local') $html_tpl = str_replace('<span class="icon-cog"></span>', '', $html_tpl);
 
@@ -80,7 +80,7 @@ $html = str_replace(["\n","\r","\t"],'',$html);
 
 $tasks = '';
 if(!empty($bhyve_ids)){
-	$tasks = $this->getRunningTasks($bhyve_ids);
+	$tasks = $clonos->getRunningTasks($bhyve_ids);
 }
 
 $html_tpl_1 = str_replace("\n","\r","\t"],'',$hres[1]);

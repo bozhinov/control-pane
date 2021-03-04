@@ -9,12 +9,12 @@ $res = [
 	]
 ];
 
-$images = $this->getImportedImages();
+$images = $clonos->getImportedImages();
 $html = '';
 $nth = 0;
 $num = $nth & 1;
 $html_tpl = '';
-$hres = $this->getTableChunk('impslist','tbody');
+$hres = $clonos->getTableChunk('impslist','tbody');
 
 if($hres !== false){
 	$html_tmp = $hres[1];
@@ -31,16 +31,16 @@ foreach($images as $item){
 
 	if($hres !== false){
 		$html_tpl = $html_tmp;
-		$filename = $this->media_import.$item['name'];
+		$filename = $clonos->media_import.$item['name'];
 		$sizefilename = $filename.'.size';
 		if(file_exists($sizefilename)){
 			$size = file_get_contents($sizefilename);
 		} else {
 			$size = filesize($filename);
 		}
-		$filesize = $this->fileSizeConvert($size, 1024, true);
+		$filesize = $clonos->fileSizeConvert($size, 1024, true);
 		$query = "select count(*) as busy from taskd where status<2 and jname='${item['jname']}'";
-		$busy = $this->_db_tasks->selectOne($query, []);
+		$busy = $clonos->_db_tasks->selectOne($query, []);
 		$jstatus = '';
 		$jbusy = '';
 		if($busy['busy'] == 1){

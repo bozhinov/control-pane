@@ -1,6 +1,6 @@
 <?php
 $jail_name = '';
-(isset($this->uri_chunks[1])) AND $jail_name = $this->uri_chunks[1];
+(isset($clonos->uri_chunks[1])) AND $jail_name = $clonos->uri_chunks[1];
 if(!empty($jail_name)){
 	include('helpers.json.php');
 	return;
@@ -18,7 +18,7 @@ $statuses = ['Not Launched','Launched','unknown-1','Maintenance','unknown-3','un
 $allnodes = [];
 $jail_ids = [];
 $nth = 0;
-$hres = $this->getTableChunk('jailslist','tbody');
+$hres = $clonos->getTableChunk('jailslist','tbody');
 
 foreach($nodes as $node){
 	$db1 = new Db('base',$node);
@@ -32,7 +32,7 @@ foreach($nodes as $node){
 				$jname = $jail['jname'];
 				$vnc_port_status = 'grey';
 				$vnc_port = '';
-				$vnc_port_file = $this->workdir.'/jails-system/'.$jname.'/vnc_port';
+				$vnc_port_file = $clonos->workdir.'/jails-system/'.$jname.'/vnc_port';
 				if(file_exists($vnc_port_file)){
 					$vnc_port = trim(file_get_contents($vnc_port_file));
 				}
@@ -77,7 +77,7 @@ $html = str_replace(["\n","\r","\t"], '', $html);
 
 $tasks = '';
 if(!empty($jail_ids)){
-	$tasks = $this->getRunningTasks($jail_ids);
+	$tasks = $clonos->getRunningTasks($jail_ids);
 }
 
 $html_tpl_1 = str_replace(["\n","\r","\t"], '', $hres[1]);

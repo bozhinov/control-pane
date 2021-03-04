@@ -1,6 +1,6 @@
 <?php
 
-$tpl->draw('dialogs\k8s-new');
+$tpl->draw('dialogs/k8s-new');
 
 /*
 Модуль kubernetes использует в работе преднастроенный образ Linux, который не входит в базовую установку ClonOS.

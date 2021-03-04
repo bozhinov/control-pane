@@ -7,8 +7,8 @@ err_messages.add({
 </script>
 <dialog id="bhyve-new" class="window-box">
 	<h1>
-		<span class="new">{translate::('Create Virtual Machine');?></span>
-		<span class="edit">{translate::('Edit Virtual Machine');?></span>
+		<span class="new">{translate::('Create Virtual Machine')</span>
+		<span class="edit">{translate::('Edit Virtual Machine')</span>
 	</h1>
 	<h2>{translate::('Virtual Machine Settings');?></h2>
 	<form class="win" method="post" id="bhyveSettings" onsubmit="return false;">
@@ -79,7 +79,7 @@ err_messages.add({
 			</p>
 			<p>
 				<span class="field-name">{translate::('VNC Password')}:</span>
-				<input type="password" name="vm_vnc_password" value="" placeholder="3-20 symbols" pattern=".{3,20}" maxlength="20"></input> <small>— {translate::('use to log in VNC console'}</small>
+				<input type="password" name="vm_vnc_password" value="" placeholder="3-20 symbols" pattern=".{3,20}" maxlength="20"></input> <small>— {translate::('use to log in VNC console')}</small>
 			</p>
 <!--			<p>
 				<span class="field-name">{translate::('CD-ROM ISO')}:</span>

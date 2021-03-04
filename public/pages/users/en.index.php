@@ -1,5 +1,5 @@
 <?php
-$tpl->draw('dialogs\users-new');
+$tpl->draw('dialogs/users-new');
 ?>
 
 <h1>User management</h1>

@@ -1,5 +1,5 @@
 <?php
-$hash = $this->url_hash;
+$hash = $clonos->url_hash;
 if(empty($hash)){
 #	Узнаём список хелперов
 	$jails_helpers = [];
@@ -33,14 +33,14 @@ if(empty($hash)){
 	$html = '';
 	$html_tpl = '';
 	$empty_logo = '/images/logo/empty.png';
-	$hres = $this->getTableChunk('helpers','tbody');
+	$hres = $clonos->getTableChunk('helpers','tbody');
 	if($hres !== false) $html_tpl = $hres[1];
 
 	if(!empty($lst) && !empty($html_tpl)){
 		foreach($lst as $item){
 			$tpl = $html_tpl;
 			$logo_file = 'images/logo/'.$item['helper'].'.png';
-			$logo = file_exists($this->realpath_public.$logo_file) ? '/'.$logo_file : $empty_logo;
+			$logo = file_exists($clonos->realpath_public.$logo_file) ? '/'.$logo_file : $empty_logo;
 			$vars = [
 				'nth-num' => 'nth0',
 				'logo' => $logo,
@@ -62,7 +62,7 @@ if(empty($hash)){
 	$helpers_list_html = '<ul class="helpers-list">';
 	foreach($hlst as $item){
 		$logo_file = 'images/logo/'.$item.'.png';
-		$logo = file_exists($this->realpath_public.$logo_file) ? '/'.$logo_file : $empty_logo;
+		$logo = file_exists($clonos->realpath_public.$logo_file) ? '/'.$logo_file : $empty_logo;
 		$helpers_list_html .= '<li><input type="checkbox" name="'.$item.'" id="'.$item.'"><label for="'.$item.'"><img src="'.$logo.'" />&nbsp; '.$item.'</label></li>';
 	}
 	$helpers_list_html .= '</ul>';

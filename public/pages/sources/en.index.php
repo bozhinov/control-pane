@@ -1,5 +1,6 @@
 <?php
-$tpl->draw('dialogs\src-get');
+$tpl->assign('clonos', $clonos);
+$tpl->draw('dialogs/src-get');
 ?>
 <h1>FreeBSD source codes:</h1>
 

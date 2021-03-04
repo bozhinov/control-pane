@@ -1,7 +1,7 @@
 <?php
 $section_name='media';
 
-$tpl->draw('dialogs\media-upload');
+$tpl->draw('dialogs/media-upload');
 ?>
 <h1>Virtual media list</h1>
 

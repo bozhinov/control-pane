@@ -16,7 +16,7 @@ $res = Auth::json_usersGetInfo();
 $html = '';
 $nth = 0;
 # TODO: refactor this with Tpl
-$hres = $this->getTableChunk('users', 'tbody');
+$hres = $clonos->getTableChunk('users', 'tbody');
 
 foreach($res as $r){
 
@@ -28,8 +28,8 @@ foreach($res as $r){
 		'date_joined' => $r['date_joined'],
 		'last_login' => $r['last_login'],
 		'is_active' => ($r['is_active']==1) ? 'icon-ok' : '',
-		'edit_title' => $this->translate('edit_title'),
-		'delete_title' => $this->translate('delete_title')
+		'edit_title' => $tpl->translate('edit_title'),
+		'delete_title' => $tpl->translate('delete_title')
 	];
 
 	$html_tpl1 = $hres[1];

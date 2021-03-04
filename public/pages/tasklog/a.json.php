@@ -1,6 +1,6 @@
 <?php
 
-$username = $this->_user_info['username'];
+$username = $clonos->_user_info['username'];
 $db = new Db('base', 'cbsdtaskd');
 $res = $db->select("SELECT id,st_time,end_time,cmd,status,errcode,logfile FROM taskd WHERE owner='?' ORDER BY id DESC", array([$username]));
 $html = '';
@@ -10,13 +10,13 @@ if($res !== false){
 	$num = $nth & 1;
 
 	foreach($res as $item){
-		$hres = $this->getTableChunk('tasklog','tbody');
+		$hres = $clonos->getTableChunk('tasklog','tbody');
 		if($hres !== false){
 			$html_tmp = $hres[1];
 			$vars = [
 				'nth-num' => 'nth'.$num,
 				'logid' => $item['id'],
-				'logcmd' => $this->colorizeCmd($item['cmd']),
+				'logcmd' => $clonos->colorizeCmd($item['cmd']),
 				'logstarttime' => date("d.m.Y H:i", strtotime($item['st_time'])),
 				'logendtime' => date("d.m.Y H:i", strtotime($item['end_time'])),
 				'logstatus' => $item['status'],
@@ -28,7 +28,7 @@ if($res !== false){
 			$logfile = $item['logfile'];
 			if(file_exists($logfile)){
 				$logsize = filesize($logfile);
-				$vars['logsize'] = $this->fileSizeConvert($logsize, 1024, true);
+				$vars['logsize'] = $clonos->fileSizeConvert($logsize, 1024, true);
 			}
 
 			$vars['buttvalue'] = $tpl->translate('Open');

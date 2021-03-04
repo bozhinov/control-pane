@@ -10,7 +10,7 @@ if($res !== false){
 
 	foreach($res as $item){
 
-		$hres = $this->getTableChunk('vpnetslist','tbody');
+		$hres = $clonos->getTableChunk('vpnetslist','tbody');
 		if($hres !== false){
 			$html_tmp = $hres[1];
 			$vars = [

@@ -9,7 +9,7 @@ if($res !== false){
 	$num = $nth & 1;
 
 	foreach($res as $item) {
-		$hres = $this->getTableChunk('authkeyslist','tbody');
+		$hres = $clonos->getTableChunk('authkeyslist','tbody');
 		if($hres !== false){
 			$html_tmp = $hres[1];
 			$vars = [

@@ -9,7 +9,7 @@ if($res !== false){
 	$num = $nth & 1;
 
 	foreach($res as $item){
-		$hres = $this->getTableChunk('mediaslist','tbody');
+		$hres = $clonos->getTableChunk('mediaslist','tbody');
 		if($hres !== false){
 			$html_tmp = $hres[1];
 			$vars = [

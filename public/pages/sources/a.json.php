@@ -8,7 +8,7 @@ $nodes[] = ['nodename' => 'local'];
 $nodes = array_reverse($nodes);
 $ids = [];
 $nth = 0;
-$hres = $this->getTableChunk('srcslist', 'tbody');
+$hres = $clonos->getTableChunk('srcslist', 'tbody');
 
 foreach($nodes as $node){
 
@@ -22,7 +22,7 @@ foreach($nodes as $node){
 
 			$idle = 1;
 			if($node['nodename'] != 'local'){
-				$idle = $this->check_locktime($node['ip']);
+				$idle = $clonos->check_locktime($node['ip']);
 			}
 
 			if($hres !== false){
@@ -61,7 +61,7 @@ $html = str_replace(["\n","\r","\t"], '', $html);
 
 $tasks = '';
 if(!empty($ids)){
-	$tasks = $this->getRunningTasks($ids);
+	$tasks = $clonos->getRunningTasks($ids);
 }
 
 $html_tpl = str_replace(["\n","\r","\t"], '', $hres[1]);

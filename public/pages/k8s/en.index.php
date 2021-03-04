@@ -1,6 +1,6 @@
 <?php
 
-$tpl->draw('dialogs\k8s-new');
+$tpl->draw('dialogs/k8s-new');
 
 ?>
 <h1>K8S Сlusters:</h1>

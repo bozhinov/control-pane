@@ -1,5 +1,5 @@
 <?php
-$tpl->draw('dialogs\vm_packages-new');
+$tpl->draw('dialogs/vm_packages-new');
 ?>
 
 <h1>VM Packages</h1>

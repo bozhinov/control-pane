@@ -1,7 +1,8 @@
 <?php
-$tpl->assign('baseCompileList', $this->getBasesCompileList());
-$tpl->draw('dialogs\bases');
-$tpl->draw('dialogs\bases-repo');
+$tpl->assign('clonos', $clonos);
+$tpl->assign('baseCompileList', $clonos->getBasesCompileList());
+$tpl->draw('dialogs/bases');
+$tpl->draw('dialogs/bases-repo');
 ?>
 <h1>Базы FreeBSD:</h1>
 

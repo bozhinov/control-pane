@@ -1,5 +1,5 @@
 <?php
-if(!empty($this->_vars['hash'])){
+if(!empty($clonos->_vars['hash'])){
 	include('helpers.php');
 	return;
 }
@@ -39,7 +39,7 @@ if($res['retval'] == 0){
 					if(!file_exists($file_name)){
 						$res = CBSD::run('forms module=%s inter=0', [$item]);
 						if($res['retval'] == 0){
-							$db = new Db('helper',$item);
+							$db = new Db('helper', $item);
 						}
 					}
 				}
@@ -54,11 +54,11 @@ if($res['retval'] == 0){
 				$description = 'helper connection error!';
 			}
 
-			$hres = $this->getTableChunk('instances','tbody');
+			$hres = $clonos->getTableChunk('instances','tbody');
 			if($hres !== false){
 				$html_tpl = $hres[1];
 				$logo_file = 'images/logo/'.$item.'.png';
-				$logo = file_exists($this->realpath_public.$logo_file) ? '/'.$logo_file : $empty_logo;
+				$logo = file_exists($clonos->realpath_public.$logo_file) ? '/'.$logo_file : $empty_logo;
 				$vars = [
 					'nth-num' => 'nth0',
 					'logo' = >$logo,

@@ -21,7 +21,7 @@ $file = getSslPage($api_ip.'/clusters');
 $html = '';
 $res = json_decode($file,true);
 $nth = 0;
-$hres = $this->getTableChunk('k8slist','tbody');
+$hres = $clonos->getTableChunk('k8slist','tbody');
 
 if(isset($res['clusters'])){
 	foreach($res['clusters'] as $cluster){

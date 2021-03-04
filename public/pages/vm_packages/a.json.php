@@ -7,7 +7,7 @@ if($db !== false){
 }
 
 $nth = 0;
-$hres = $this->getTableChunk('packages', 'tbody');
+$hres = $clonos->getTableChunk('packages', 'tbody');
 $html_tpl = $hres[1];
 
 foreach($res as $r){
