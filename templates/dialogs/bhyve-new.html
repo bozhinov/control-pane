@@ -19,7 +19,7 @@ err_messages.add({
 					{loop="$os_types"}
 						<optgroup label="{$value.os}">
 							{loop="$value.items"}
-								<option value="{$key}.{key1}">{$value1.name}</option>
+								<option value="{$key}.{key1}">{$value2.name}</option>
 							{/loop}
 						</optgroup>
 					{/loop}
@@ -34,9 +34,9 @@ err_messages.add({
 				<select name="vm_packages" onchange="clonos.onChangePkgTemplate(this,event);">
 					<option value="0"></option>
 					{loop="$vm_res"}
-					<option value="{$val['id']}" title="{$val['description']}">
-						<strong>{$val['name']}</strong>
-						{$val['text']}
+					<option value="{$value['id']}" title="{$value['description']}">
+						<strong>{$value['name']}</strong>
+						{$value['text']}
 					</option>
 					{/loop}
 				</select>

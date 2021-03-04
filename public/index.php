@@ -15,8 +15,9 @@ function get_title($menu_config, $active)
 	}
 
 	if($title == 'Error'){
-		if(isset(Config::$other_titles[$active])){
-			$title = $other_titles[$active];
+		$ot = Config::$other_titles
+		if(isset($ot[$active])){
+			$title = $ot[$active];
 		}
 	}
 
