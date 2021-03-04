@@ -121,6 +121,13 @@ switch ($url){
 		$tpl->draw('dialogs/media-upload');
 		$tpl->draw('pages/media.'.$lang)
 		break;
+	case "nodes":
+		break;
+	case "overview":
+		$tpl->draw('pages/overview.'.$lang)
+		break;
+	case "settings": # TODO
+		$tpl->draw('pages/settings.'.$lang)
 	default:
 		$file_name = 'pages/'.$uri.'/'.$lang.'.index.php';
 		if(file_exists($file_name)){
