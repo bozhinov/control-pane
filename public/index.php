@@ -71,11 +71,52 @@ $tpl->assign([
 ]);
 $tpl->draw("index.1");
 
-$file_name = 'pages/'.$uri.'/'.$lang.'.index.php';
-if(file_exists($file_name)){
-	include($file_name);
-} else {
-	echo '<h1>Not implemented yet!</h1>';
+
+switch ($url){
+	case "authkey":
+		$tpl->draw('dialogs/authkey');
+		$tpl->draw('pages/authkey.'.$lang);
+		break;
+	case "bases":
+		$tpl->assign('clonos', $clonos);
+		$tpl->assign('baseCompileList', $clonos->getBasesCompileList());
+		$tpl->draw('dialogs/bases');
+		$tpl->draw('dialogs/bases-repo');
+		$tpl->draw('pages/bases.'.$lang);
+		break;
+	case "bhyvevms":
+		$tpl->assign('clonos', $clonos);
+		$tpl->draw('dialogs/vnc-bhyve');
+		$tpl->assign("media_iso_list", $clonos->media_iso_list());
+		list($vm_res, $min_id) = $clonos->vm_packages_list();
+		$tpl->assign([
+			"vm_res" => $vm_res,
+			"min_id" => $min_id,
+			"ifs" => $clonos->get_interfaces(),
+			"os_types_obtain" => $clonos->os_types_create('obtain'),
+			"os_types" => $clonos->os_types_create()],
+			"authkeys_list" => $clonos->authkeys_list()
+		]);
+		$tpl->draw('dialogs/bhyve-new');
+		$tpl->draw('dialogs/bhyve-obtain');
+		$tpl->draw('dialogs/bhyve-clone');
+		$tpl->draw('dialogs/bhyve-rename');
+		$tpl->draw('dialogs/jail-settings-config-menu');
+		$tpl->draw('pages/bhyvevms.'.$lang);
+		break;
+	case "imported":
+		$tpl->draw('dialogs/jail-import');
+		$tpl->draw('dialogs/image-import');
+		//$tpl->draw('dialogs/jail-settings-config-menu');
+		$tpl->draw('pages/imported.'.$lang);
+		break;
+	default:
+		$file_name = 'pages/'.$uri.'/'.$lang.'.index.php';
+		if(file_exists($file_name)){
+			include($file_name);
+		} else {
+			echo '<h1>Not implemented yet!</h1>';
+		}
 }
 
 $tpl->draw("index.2");

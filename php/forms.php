@@ -104,7 +104,7 @@ class Forms
 			if(is_numeric($key)){
 				$html .= $arr[$key];
 			} else if(is_array($txt)){
-				$group_name = key($txt);
+				#$group_name = key($txt);
 				$group_title = $txt['_title'];
 				unset($txt['_title']);
 				foreach($txt as $key1 => $val1){
