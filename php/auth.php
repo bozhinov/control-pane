@@ -8,6 +8,8 @@
 
 class Auth {
 
+	public $json_req = false;
+	public $sys_vars = [];
 	public $authorized = false; # TODO Move to SESSION
 	private $_user_info = [
 		'id' => 0,
@@ -20,37 +22,39 @@ class Auth {
 	function __construct()
 	{
 		$this->_client_ip = $_SERVER['REMOTE_ADDR'];
-		$this->form = (isset($_POST['form_data'])) ? $_POST['form_data'] : [];
+		$this->form = (isset($_REQUEST['form_data'])) ? $_REQUEST['form_data'] : [];
 		$ures = $this->userAutologin();
+		$this->sys_vars['authorized'] = false;
 		if($ures !== false){
 			if(isset($ures['id']) && is_numeric($ures['id']) && $ures['id'] > 0){
 				$this->_user_info = $ures;
 				$this->_user_info['unregistered'] = false;
 				$this->authorized = true;
+				$this->sys_vars['authorized'] = true;
 			} else {
 				$this->_user_info['unregistered'] = true;
 				if($this->json_req) exit;
 			}
 		}
 
-		if(isset($_POST['mode'])){
+		if(isset($_REQUEST['mode'])){
 			if(isset($this->_user_info['error']) && $this->_user_info['error']){
-				if($_POST['mode'] != 'login'){
+				if($_REQUEST['mode'] != 'login'){
 					echo json_encode(['error' => true, 'unregistered_user' => true]);
 					exit;
 				}
 			}
 
-			if($this->_user_info['unregistered'] && $_POST['mode'] != 'login'){
+			if($this->_user_info['unregistered'] && $_REQUEST['mode'] != 'login'){
 				echo json_encode(['error' => true, 'unregistered_user' => true]);
 				exit;
 			}
 
 			$new_array = []; # TODO: Fix this mess
-			$cfunc = 'ccmd_'.$this->mode;
+			$cfunc = 'ccmd_'.$_REQUEST['mode'];
 			if(method_exists($this, $cfunc)){
 				$ccmd_res = $this->$cfunc();
-				
+
 				if(is_array($ccmd_res)){
 					$new_array = array_merge($this->sys_vars, $ccmd_res);
 				} else {
@@ -125,7 +129,7 @@ class Auth {
 					}
 				}
 
-				setcookie('mhash', $memory_hash,time() + 1209600);
+				setcookie('mhash', $memory_hash, time() + 1209600);
 
 				return $res;
 			}

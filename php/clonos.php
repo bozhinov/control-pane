@@ -88,7 +88,6 @@ class ClonOS
 			$cfunc = 'ccmd_'.$this->mode;
 			if(method_exists($this, $cfunc)){
 				$ccmd_res = $this->$cfunc();
-				
 				if(is_array($ccmd_res)){
 					$new_array = array_merge($this->sys_vars, $ccmd_res);
 				} else {
