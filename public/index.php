@@ -110,6 +110,17 @@ switch ($url){
 		//$tpl->draw('dialogs/jail-settings-config-menu');
 		$tpl->draw('pages/imported.'.$lang);
 		break;
+	case "instance_jail":
+		$tpl->draw('pages/instance_jail.'.$lang);
+		break;
+	case "k8s":
+		$tpl->draw('dialogs/k8s-new');
+		$tpl->draw('pages/k8s.'.$lang);
+		break;
+	case "media":
+		$tpl->draw('dialogs/media-upload');
+		$tpl->draw('pages/media.'.$lang)
+		break;
 	default:
 		$file_name = 'pages/'.$uri.'/'.$lang.'.index.php';
 		if(file_exists($file_name)){
