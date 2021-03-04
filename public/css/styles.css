@@ -91,11 +91,11 @@ main {
 	cursor:pointer;
 }
 header {
-	position:absolute;
+	position: absolute;
 	width:100%;
 	top:0;
 	height:72px;
-	overflow:hidden;
+	z-index:999;
 }
 .header {
 	border-bottom: 5px solid #0F83A0;
