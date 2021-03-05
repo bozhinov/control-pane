@@ -14,76 +14,66 @@ class Db {
 	function __construct($place = 'base', $database = '', $connect = null)
 	{
 		if (is_null($connect)){
-			list($file_name, $connect) = $this->prep_connect($place, $database);
-
-			if(is_null($file_name) || !file_exists($file_name)){
-				$this->error = true;
-				$this->error_message = 'DB file name not set or not found!';
-				return;
-			} else {
-				$this->_filename = $file_name;
-			}
-
-			if(is_null($connect)) {
-				$this->error = true;
-				$this->error_message = 'DB file name not set or invalid';
-				return;
-			}
+			$connect = $this->prep_connect($place, $database);
 		}
 
-		try {
-			$this->_pdo = new PDO($connect);
-			$this->_pdo->setAttribute(PDO::ATTR_TIMEOUT, 5000);
-		} catch (PDOException $e){
-			$this->error = true;
-			$this->error_message = $e->getMessage();
+		if (!$this->error){
+			try {
+				$this->_pdo = new PDO($connect);
+				$this->_pdo->setAttribute(PDO::ATTR_TIMEOUT, 5000);
+			} catch (PDOException $e){
+				$this->error = true;
+				$this->error_message = $e->getMessage();
+			}
 		}
 	}
 
 	private function prep_connect($place, $database)
 	{
 		$this->_workdir = getenv('WORKDIR');	// /usr/jails/
-		$connect = null;
-		$file_name = null;
+		$this->_filename = null;
 
 		switch($place){
-			case 'base':
-				$file_name = $this->_workdir.'/var/db/'.$database.'.sqlite';
-				$connect = 'sqlite:'.$file_name;
+			case 'base': # TODO: is this correct?
+				$this->_filename = $this->_workdir.'/var/db/'.$database.'.sqlite';
 				break;
 			case 'file':
-				$file_name = $database;
-				$connect = 'sqlite:'.$file_name;
+				$this->_filename = $database;
 				break;
 			case 'helper':
 				if(is_array($database)){
 					///usr/jails/jails-system/cbsdpuppet1/helpers/redis.sqlite
-					$file_name = $this->_workdir.'/jails-system/'.$database['jname'].'/helpers/'.$database['helper'].".sqlite";
-					$connect = 'sqlite:'.$file_name;
+					$this->_filename = $this->_workdir.'/jails-system/'.$database['jname'].'/helpers/'.$database['helper'].".sqlite";
 				} else {
-					$file_name = $this->_workdir.'/formfile/'.$database.".sqlite";
-					$connect = 'sqlite:'.$file_name;
+					$this->_filename = $this->_workdir.'/formfile/'.$database.".sqlite";
 				}
 				break;
 			case 'cbsd-settings':
-				$file_name = $this->_workdir.'/jails-system/CBSDSYS/helpers/cbsd.sqlite';
-				$connect = 'sqlite:'.$file_name;
+				$this->_filename = $this->_workdir.'/jails-system/CBSDSYS/helpers/cbsd.sqlite';
 				break;
 			case 'clonos':
-				$file_name = '/var/db/clonos/clonos.sqlite';
-				$connect = 'sqlite:'.$file_name;
+				$this->_filename = '/var/db/clonos/clonos.sqlite';
 				break;
 			case 'racct':
-				$file_name = $this->_workdir.'/jails-system/'.$database['jname'].'/racct.sqlite';
-				$connect = 'sqlite:'.$file_name;
+				$this->_filename = $this->_workdir.'/jails-system/'.$database['jname'].'/racct.sqlite';
 				break;
 			case 'bhyve':
-				$file_name = $this->_workdir.'/jails-system/'.$database['jname'].'/local.sqlite';
-				$connect = 'sqlite:'.$file_name;
+				$this->_filename = $this->_workdir.'/jails-system/'.$database['jname'].'/local.sqlite';
+				
 				break;
+			default:
+				$this->error = true;
+				$this->error_message = 'DB file name not set or invalid';
+				return null;
 		}
 
-		return [$file_name, $connect];
+		if(is_null($this->_filename) || !file_exists($this->_filename)){
+			$this->error = true;
+			$this->error_message = 'DB file name not set or not found!';
+			return null;
+		}
+
+		return 'sqlite:'.$this->_filename;
 	}
 
 	# TODO once tested $values can have a default value of an empty array

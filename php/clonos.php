@@ -264,7 +264,7 @@ class ClonOS
 
 	function get_node_info($nodename, $value)
 	{
-		$db = new Db('', '', $this->realpath."/var/db/nodes.sqlite"); 
+		$db = new Db('', '', $this->realpath."/var/db/nodes.sqlite"); # TODO: Why is this here?
 		if (!$db->isConnected()) return ['error' => true, 'res' => $db->error_message];
 
 		$result = $db->select("SELECT ? FROM nodelist WHERE nodename=?", array([$value], [$nodename]));
