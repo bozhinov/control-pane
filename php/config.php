@@ -201,4 +201,24 @@ class Config
 		}
 		return $os_names;
 	}
+
+	public static function get_title($active)
+	{
+		$title = 'Error';
+
+		foreach(self::menu as $link => $val){
+			if($active == $link){
+				$title = $val['title'];
+			}
+		}
+
+		if($title == 'Error'){
+			$ot = self::other_titles;
+			if(isset($ot[$active])){
+				$title = $ot[$active];
+			}
+		}
+
+		return $title;
+	}
 }
