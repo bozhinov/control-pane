@@ -114,8 +114,8 @@ switch ($url){
 		$tpl->draw('pages/instance_jail.'.$lang);
 		break;
 	case "jailscontainers":
-		if(isset($clonos->uri_chunks[1])){
-			$tpl->assign('chunk', $clonos->uri_chunks[1]);
+		if(isset($chunks[1])){
+			$tpl->assign('chunk', $chunks[1]);
 			$tpl->draw('dialogs/helpers-add');
 			$tpl->draw('pages/jailscontainers_helper');
 		}
