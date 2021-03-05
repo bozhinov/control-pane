@@ -75,14 +75,14 @@ $tpl->draw("index.1");
 switch ($url){
 	case "authkey":
 		$tpl->draw('dialogs/authkey');
-		$tpl->draw('pages/authkey.'.$lang);
+		$tpl->draw('pages/'.$lang.'/authkey');
 		break;
 	case "bases":
 		$tpl->assign('clonos', $clonos);
 		$tpl->assign('baseCompileList', $clonos->getBasesCompileList());
 		$tpl->draw('dialogs/bases');
 		$tpl->draw('dialogs/bases-repo');
-		$tpl->draw('pages/bases.'.$lang);
+		$tpl->draw('pages/'.$lang.'/bases');
 		break;
 	case "bhyvevms":
 		$tpl->assign('clonos', $clonos);
@@ -102,22 +102,22 @@ switch ($url){
 		$tpl->draw('dialogs/bhyve-clone');
 		$tpl->draw('dialogs/bhyve-rename');
 		$tpl->draw('dialogs/jail-settings-config-menu');
-		$tpl->draw('pages/bhyvevms.'.$lang);
+		$tpl->draw('pages/'.$lang.'/bhyvevms');
 		break;
 	case "imported":
 		$tpl->draw('dialogs/jail-import');
 		$tpl->draw('dialogs/image-import');
 		//$tpl->draw('dialogs/jail-settings-config-menu');
-		$tpl->draw('pages/imported.'.$lang);
+		$tpl->draw('pages/'.$lang.'/imported');
 		break;
 	case "instance_jail":
-		$tpl->draw('pages/instance_jail.'.$lang);
+		$tpl->draw('pages/'.$lang.'/instance_jail');
 		break;
 	case "jailscontainers":
 		if(isset($chunks[1])){
 			$tpl->assign('chunk', $chunks[1]);
 			$tpl->draw('dialogs/helpers-add');
-			$tpl->draw('pages/jailscontainers_helper');
+			$tpl->draw('pages/'.$lang.'/jailscontainers_helper');
 		}
 		$tpl->draw('dialogs/vnc');
 		$tpl->draw('dialogs/jail-settings');
@@ -125,58 +125,52 @@ switch ($url){
 		$tpl->draw('dialogs/jail-import');
 		$tpl->draw('dialogs/jail-clone');
 		$tpl->draw('dialogs/jail-rename');
-		$tpl->draw('pages/jailscontainers.'.$lang);
+		$tpl->draw('pages/'.$lang.'/jailscontainers');
 		break;
 	case "k8s":
 		$tpl->draw('dialogs/k8s-new');
-		$tpl->draw('pages/k8s.'.$lang);
+		$tpl->draw('pages/'.$lang.'/k8s');
 		break;
 	case "media":
 		$tpl->draw('dialogs/media-upload');
-		$tpl->draw('pages/media.'.$lang);
+		$tpl->draw('pages/'.$lang.'/media');
 		break;
 	case "nodes":
 		break;
 	case "overview":
-		$tpl->draw('pages/overview.'.$lang);
+		$tpl->draw('pages/'.$lang.'/overview');
 		break;
 	case "settings": # TODO
 		require_once('../php/forms2.php');
 		$settings_tpl = (new Forms2())->generate();
 		$tpl->assign('settings_tpl', $settings_tpl);
-		$tpl->draw('pages/settings.'.$lang);
+		$tpl->draw('pages/'.$lang.'/settings');
 		break;
 	case "sources":
 		$tpl->assign('clonos', $clonos);
 		$tpl->draw('dialogs/src-get');
-		$tpl->draw('pages/sources.'.$lang);
+		$tpl->draw('pages/'.$lang.'/sources');
 		break;
 	case "sqlite":
-		$tpl->draw('pages/sqlite.'.$lang);
+		$tpl->draw('pages/'.$lang.'/sqlite');
 		break;
 	case "tasklog":
 		$tpl->draw('dialogs/tasklog');
-		$tpl->draw('pages/tasklog.'.$lang);
+		$tpl->draw('pages/'.$lang.'/tasklog');
 		break;
 	case "users":
 		$tpl->draw('dialogs/users-new');
-		$tpl->draw('pages/users.'.$lang);
+		$tpl->draw('pages/'.$lang.'/users');
 		break;
 	case "vm_packages":
 		$tpl->draw('dialogs/vm_packages-new');
-		$tpl->draw('pages/vm_packages.'.$lang);
+		$tpl->draw('pages/'.$lang.'/vm_packages');
 		break;
 	case "vpnet":
 		$tpl->draw('dialogs/vpnet');
-		$tpl->draw('pages/vpnet.'.$lang);
+		$tpl->draw('pages/'.$lang.'/vpnet');
 		break;
-	default:
-		$file_name = 'pages/'.$uri.'/'.$lang.'.index.php';
-		if(file_exists($file_name)){
-			include($file_name);
-		} else {
 			echo '<h1>Not implemented yet!</h1>';
-		}
 }
 
 $tpl->draw("index.2");
