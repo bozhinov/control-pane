@@ -21,10 +21,12 @@ class Auth {
 		}
 		$this->_client_ip = $_SERVER['REMOTE_ADDR'];
 		(isset($_REQUEST['form_data'])) AND $this->form = $_REQUEST['form_data'];
-		$ures = $this->userAutologin();
-		if(!$ures['error']){
-			if(isset($ures['id'])){
-				$this->_user_info = $ures;
+
+		if(isset($_COOKIE['mhash'])){
+			$query = "SELECT au.id,au.username FROM auth_user au, auth_list al WHERE al.secure_sess_id=? AND au.id=al.user_id AND au.is_active=1";
+			$res = $this->db->selectOne($query, array([md5($_COOKIE['mhash'].$this->_client_ip)]));
+			if(isset($res['id'])){
+				$this->_user_info = $res;
 				$this->_user_info['unregistered'] = false;
 				$this->authorized = true;
 			} else {
@@ -70,19 +72,6 @@ class Auth {
 		}
 
 		echo json_encode($ccmd_res);
-	}
-
-	private function userAutologin()
-	{
-		if(isset($_COOKIE['mhash'])){
-			$query = "SELECT au.id,au.username FROM auth_user au, auth_list al WHERE al.secure_sess_id=? AND au.id=al.user_id AND au.is_active=1";
-			$res = $this->db->selectOne($query, array([md5($_COOKIE['mhash'].$this->_client_ip)]));
-			if(!empty($res)){
-				$res['error'] = false;
-				return $res;
-			}
-		}
-		return ['error' => true];
 	}
 
 	private function getPasswordHash($password)
