@@ -163,11 +163,6 @@ class Db {
 		return !is_null($this->_pdo);
 	}
 
-	function getWorkdir()
-	{
-		return $this->_workdir;
-	}
-
 	function getFileName()
 	{
 		return $this->_filename;

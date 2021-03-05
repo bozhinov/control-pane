@@ -29,9 +29,7 @@ class Forms
 			$database = ['jname' => $jname, 'helper' => $helper];
 		}
 
-		if($jname == 'cbsd-settings'){
-			$this->db = new Db('cbsd-settings');
-		} else if($helper != ''){
+		if($helper != ''){
 			if($db_path !== false){
 				$this->db = new Db('file', $db_path);
 			} else {

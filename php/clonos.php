@@ -1328,7 +1328,7 @@ class ClonOS
 		if($nres['authkey'] !== false){
 			$authkey = $nres['authkey'];
 		} else { 
-			$authkey='';
+			$authkey = '';
 		}
 
 		$user_pw = (!empty($form['user_password'])) ? ' ci_user_pw_user='.$form['user_password'].' ' : '';

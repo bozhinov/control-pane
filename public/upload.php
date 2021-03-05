@@ -12,21 +12,21 @@ if (isset($auth)){
 
 header('Content-Type: application/json');
 
-$cmd='';
+$cmd = '';
 $status = '';
 
 if($_SERVER['REQUEST_METHOD'] === 'POST'){
-	$path=realpath('').'/media/';
+	$path = realpath('').'/media/';
 	if(isset($_POST['uplace'])){
-		$res=strpos($_POST['uplace'],'jailscontainers');
-		if($res!==false){
-			$path=$clonos->media_import;
-			$cmd='import';
+		$res = strpos($_POST['uplace'], 'jailscontainers');
+		if($res !== false){
+			$path = $clonos->media_import;
+			$cmd = 'import';
 		}
-		$res=strpos($_POST['uplace'],'imported');
-		if($res!==false){
-			$path=$clonos->media_import;
-			$cmd='import';
+		$res = strpos($_POST['uplace'],'imported');
+		if($res !== false){
+			$path = $clonos->media_import;
+			$cmd = 'import';
 		}
 	}
 
@@ -37,7 +37,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
 		!isset($_FILES['file']['error']) ||
 		is_array($_FILES['file']['error'])
 	) {
-		echo json_encode(array('status' => 'Upload Fail: An error occurred!';));
+		echo json_encode(['status' => 'Upload Fail: An error occurred!']);
 		exit;
 	}
 
@@ -46,8 +46,8 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
 
 		if (move_uploaded_file($_FILES['file']['tmp_name'], $path.$basename)){
 			$status = 'ok';	//'Successfully uploaded!';
-			if($cmd=='import'){
-				$res=CBSD::run('task owner=%s mode=new /usr/local/bin/cbsd jimport jname=%s inter=0', [$auth->getUserName(), $path.$basename]);
+			if($cmd == 'import'){
+				$res = CBSD::run('task owner=%s mode=new /usr/local/bin/cbsd jimport jname=%s inter=0', [$auth->getUserName(), $path.$basename]);
 			}
 		} else {
 			$status = 'Upload Fail: Unknown error occurred!';
@@ -55,18 +55,18 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
 	}
 }
 
-if($status!='ok'){
-	echo json_encode(array('status' => $status));
+if($status != 'ok'){
+	echo json_encode(['status' => $status]);
 	exit;
 }
 return; # TODO ?!
 
-$valid_exts = array('image/jpeg', 'image/jpg', 'image/png', 'image/gif'); // valid extensions
+$valid_exts = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif']; // valid extensions
 $max_size = 30000 * 1024; // max file size in bytes
 
 if ( $_SERVER['REQUEST_METHOD'] === 'POST' ){
-	for($i=0;$i<count($_FILES['file']['tmp_name']);$i++){
-		$path="/media/";
+	for($i = 0; $i < count($_FILES['file']['tmp_name']); $i++){
+		$path = "/media/";
 
 		if(is_uploaded_file($_FILES['file']['tmp_name'][$i]) ){
 			// get uploaded file extension
@@ -99,4 +99,4 @@ if ( $_SERVER['REQUEST_METHOD'] === 'POST' ){
 	$status = 'Bad request!';
 }
 
-echo json_encode(array('status' => $status));
+echo json_encode(['status' => $status]);
