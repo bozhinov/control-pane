@@ -141,6 +141,9 @@ switch ($url){
 		$tpl->draw('pages/overview.'.$lang);
 		break;
 	case "settings": # TODO
+		require_once('../php/forms2.php');
+		$settings_tpl = (new Forms2())->generate();
+		$tpl->assign('settings_tpl', $settings_tpl);
 		$tpl->draw('pages/settings.'.$lang);
 		break;
 	case "sources":
