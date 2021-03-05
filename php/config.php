@@ -5,6 +5,7 @@ require_once("cbsd.php");
 class Config
 {
 	public static $version = '20.12';
+	public static $salt_file = '/var/db/clonos/salt';
 	/* Список языков, используемых в проекте */
 	public static $languages = [
 		'en' => 'English',

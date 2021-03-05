@@ -33,14 +33,9 @@ if(empty($uri)){
 	$active = trim($uri, '/');
 }
 
-$user_info = $auth->userAutologin(); # TODO: Move to SESSION
-if($user_info['error']){
-	$user_info['username'] = 'guest';
-}
-
 $tpl->assign([
 	"version" => Config::$version,
-	"user_info" => $user_info,
+	"user_info" => $auth->_user_info,
 	"title" => Config::get_title($active),
 	"uri" => $uri,
 	"isDev" => (getenv('APPLICATION_ENV') == 'development'), # TODO: Move to SESSION
