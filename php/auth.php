@@ -4,14 +4,13 @@ class Auth {
 
 	public $json_req = false;
 	public $authorized = false;
+	public $_user_info = [
+		'id' => 0,
+		'username' => 'guest'
+	];
 	private $db;
 	private $form = [];
 	private $_client_ip = '';
-	private $_user_info = [
-		'id' => 0,
-		'username' => 'guest',
-		'unregistered' => true
-	];
 
 	function __construct()
 	{
@@ -27,30 +26,27 @@ class Auth {
 			$res = $this->db->selectOne($query, array([md5($_COOKIE['mhash'].$this->_client_ip)]));
 			if(isset($res['id'])){
 				$this->_user_info = $res;
-				$this->_user_info['unregistered'] = false;
 				$this->authorized = true;
 			} else {
 				if($this->json_req) exit;
 			}
 		}
 
-		$ccmd_res = [];
-		$ccmd_res["authorized"] = $this->authorized;
+		$ccmd_res = ["authorized" => $this->authorized];
 
 		if(isset($_REQUEST['mode'])){
-			if($this->_user_info['error']){
-				if($_REQUEST['mode'] != 'login'){
+
+			if ($_REQUEST['mode'] != 'login')){
+				if(!$this->authorized){
 					echo json_encode(['error' => true, 'unregistered_user' => true]);
 					exit;
 				}
 			}
 
-			if($this->_user_info['unregistered'] && $_REQUEST['mode'] != 'login'){
-				echo json_encode(['error' => true, 'unregistered_user' => true]);
-				exit;
-			}
-
 			switch ($_REQUEST['mode']){
+				case 'login':
+					$ccmd_res = $this->ccmd_login();
+					break;
 				case 'usersAdd':
 					$ccmd_res = $this->ccmd_usersAdd();
 					break;

@@ -23,7 +23,7 @@ class ClonOS
 	public $url_hash = '';
 	public $media_import = '';
 	public $json_req = false;
-	public $sys_vars = [];
+	public $_user_info; # Comes from Auth TODO
 	private $_vars = [];
 	private $_locale;
 	private $_db = null;
@@ -84,41 +84,22 @@ class ClonOS
 
 		if(isset($_POST['mode'])){
 			// functions, running without parameters
-			$new_array = []; # TODO: Fix this mess
+
 			$cfunc = 'ccmd_'.$this->mode;
 			if(method_exists($this, $cfunc)){
 				$ccmd_res = $this->$cfunc();
-				if(is_array($ccmd_res)){
-					$new_array = array_merge($this->sys_vars, $ccmd_res);
-				} else {
-					echo json_encode($ccmd_res);
-					return;
-				}
-				echo json_encode($new_array);
+				echo json_encode($ccmd_res);
 				return;
 			}
 
-			#$included_result_array = ''; # used in a.jason files
 			switch($this->mode){
-				//case 'login':	 		echo json_encode($this->login()); break;
 				case 'getTasksStatus':
 					echo json_encode($this->_getTasksStatus($this->form['jsonObj']));
 					break;
 
 				/*
 				case '_getJsonPage':
-					if(file_exists($this->json_name)){
-						include($this->json_name);
-						if(is_array($included_result_array)){
-							$new_array=array_merge($this->sys_vars,$included_result_array);
-							echo json_encode($new_array);
-							return;
-						} else {
-							echo '{}';
-						}
-					} else {
-						echo '{}';
-					}
+					die("Hard stop 1");
 					break;
 				*/
 				//case 'freejname':		echo json_encode($this->getFreeJname()); break;
@@ -201,13 +182,8 @@ class ClonOS
 		$included_result_array = false;
 		if(file_exists($this->json_name)){
 			include($this->json_name);
-			if(is_array($included_result_array)){
-				$new_array = array_merge($this->sys_vars, $included_result_array);
-				echo json_encode($new_array);
-				exit;
-			}
 		}
-		echo json_encode($this->sys_vars);
+		echo json_encode($included_result_array);
 		exit;
 	}
 

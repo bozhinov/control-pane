@@ -4,11 +4,13 @@ require_once('../php/auth.php');
 require_once('../php/clonos.php');
 require_once('../php/tpl.php');
 
+$auth = new Auth();
+
 $uri = trim($_SERVER['REQUEST_URI'], '/');
 $chunks = Utils::gen_uri_chunks($uri);
-
 $clonos = new ClonOS($chunks);
-$auth = new Auth();
+$clonos->_user_info = $auth->_user_info; # TODO: Fix this
+
 $tpl = new Tpl();
 $lang = $tpl->get_lang();
 
