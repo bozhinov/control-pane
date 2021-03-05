@@ -72,7 +72,7 @@ $tpl->assign([
 $tpl->draw("index.1");
 
 
-switch ($url){
+switch ($active){
 	case "authkey":
 		$tpl->draw('dialogs/authkey');
 		$tpl->draw('pages/'.$lang.'/authkey');
@@ -94,7 +94,7 @@ switch ($url){
 			"min_id" => $min_id,
 			"ifs" => $clonos->get_interfaces(),
 			"os_types_obtain" => $clonos->os_types_create('obtain'),
-			"os_types" => $clonos->os_types_create()],
+			"os_types" => $clonos->os_types_create(),
 			"authkeys_list" => $clonos->authkeys_list()
 		]);
 		$tpl->draw('dialogs/bhyve-new');
