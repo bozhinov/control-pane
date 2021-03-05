@@ -1,11 +1,5 @@
 <?php
 
-//case 'usersAdd':		echo json_encode($this->usersAdd()); return;
-//case 'usersEdit':		echo json_encode($this->usersEdit()); return;
-//case 'userRemove':		echo json_encode($this->userRemove()); return;
-//case 'userGetInfo':		echo json_encode($this->userGetInfo()); return;
-//case 'userEditInfo':		echo json_encode($this->userEditInfo()); return;
-
 class Auth {
 
 	public $json_req = false;
@@ -38,6 +32,9 @@ class Auth {
 			}
 		}
 
+		$ccmd_res = [];
+		$ccmd_res["authorized"] = $this->authorized;
+
 		if(isset($_REQUEST['mode'])){
 			if($this->_user_info['error']){
 				if($_REQUEST['mode'] != 'login'){
@@ -51,20 +48,56 @@ class Auth {
 				exit;
 			}
 
-			$cfunc = 'ccmd_'.$_REQUEST['mode'];
-			if(method_exists($this, $cfunc)){
-				$ccmd_res = $this->$cfunc();
-
-				if(is_array($ccmd_res)){
-					$ccmd_res["authorized"] = $this->authorized;
-				}
-
-				echo json_encode($ccmd_res);
+			switch ($_REQUEST['mode']){
+				case 'usersAdd':
+					$ccmd_res = $this->ccmd_usersAdd();
+					break;
+				case 'usersEdit':
+					$ccmd_res = $this->ccmd_usersEdit();
+					break;
+				case 'userRemove':
+					$ccmd_res = $this->ccmd_userRemove();
+					break;
+				case 'userGetInfo':
+					$ccmd_res = $this->ccmd_userGetInfo();
+					break;
+				case 'userEditInfo':
+					$ccmd_res = $this->ccmd_userEditInfo();
+					break;
+				#default: # Can't uncomment it right now until I have a dispatcher of a sort
+					# echo json_encode(['error' => true, 'unknown command' => true]);
 			}
 		}
+
+		echo json_encode($ccmd_res);
 	}
 
-	private function userRegisterCheck($user_info = [])
+	private function userAutologin()
+	{
+		if(isset($_COOKIE['mhash'])){
+			$query = "SELECT au.id,au.username FROM auth_user au, auth_list al WHERE al.secure_sess_id=? AND au.id=al.user_id AND au.is_active=1";
+			$res = $this->db->selectOne($query, array([md5($_COOKIE['mhash'].$this->_client_ip)]));
+			if(!empty($res)){
+				$res['error'] = false;
+				return $res;
+			}
+		}
+		return ['error' => true];
+	}
+
+	private function getPasswordHash($password)
+	{
+		return hash('sha256', hash('sha256', $password) . $this->getSalt());
+	}
+
+	private function getSalt()
+	{
+		$salt_file = Config::$salt_file; # TODO: use config for this
+		if(file_exists($salt_file)) return trim(file_get_contents($salt_file));
+		throw new Exception('noSalt!');
+	}
+
+	private function ccmd_login()
 	{
 		/*
 		[0] => Array
@@ -81,7 +114,7 @@ class Auth {
 			[secure_sess_id] => 
 		)
 		*/
-
+		$user_info = $this->form;
 		if(empty($user_info)) return ['errorCode' => 1,'message' => 'empty user info!'];
 
 		if(isset($user_info['login']) && isset($user_info['password'])){
@@ -121,73 +154,14 @@ class Auth {
 				}
 			}
 
-			setcookie('mhash', $memory_hash, time() + 1209600);
+			setcookie('mhash', $memory_hash, time() + 1209600); # 20min
 
 			return $res;
 		}
 		return ['message' => 'unregistered user', 'errorCode' => 1];
 	}
 
-	private function userRegister()
-	{
-		$user_info = $this->form;
-
-		if(isset($user_info['username']) && isset($user_info['password'])){
-			$user = $user_info['username'];
-			$pass = $user_info['password'];
-			if ((strlen($user) < 4) || strlen($pass) < 6){
-				return ['error' => true, 'errorMessage' => 'Username or/and Password is not long enough!'];
-			}
-			$res = $this->db->selectOne("SELECT username FROM auth_user WHERE username=?", array([$user]));
-			if(!empty($res)){
-				return ['error' => true, 'errorType' => 'user-exists', 'errorMessage' => 'User always exists!'];
-			}
-
-			$pass = $this->getPasswordHash($pass);
-			$is_active = 0;
-			if(isset($user_info['actuser']) && $user_info['actuser'] == 'on') $is_active = 1;
-			$query = "INSERT INTO auth_user
-				(username,password,first_name,last_name,is_active,date_joined) VALUES
-				(?,?,?,?,?,datetime('now','localtime'))";
-			$res = $this->db->update($query, [
-				[$user],
-				[$pass],
-				[$user_info['first_name']],
-				[$user_info['last_name']],
-				[$is_active]
-			]);
-			return ['error' => false];
-		} else {
-			return ['error' => true];
-		}
-	}
-
-	private function userAutologin()
-	{
-		if(isset($_COOKIE['mhash'])){
-			$query = "SELECT au.id,au.username FROM auth_user au, auth_list al WHERE al.secure_sess_id=? AND au.id=al.user_id AND au.is_active=1";
-			$res = $this->db->selectOne($query, array([md5($_COOKIE['mhash'].$this->_client_ip)]));
-			if(!empty($res)){
-				$res['error'] = false;
-				return $res;
-			}
-		}
-		return ['error' => true];
-	}
-
-	private function getPasswordHash($password)
-	{
-		return hash('sha256', hash('sha256', $password) . $this->getSalt());
-	}
-
-	private function getSalt()
-	{
-		$salt_file = Config::$salt_file; # TODO: use config for this
-		if(file_exists($salt_file)) return trim(file_get_contents($salt_file));
-		throw new Exception('noSalt!');
-	}
-
-	function ccmd_usersEdit()
+	private function ccmd_usersEdit()
 	{
 		$form = $this->form;
 
@@ -245,16 +219,41 @@ class Auth {
 		return ['error' => false, 'res' => $res];
 	}
 
-	function ccmd_usersAdd()
+	private function ccmd_usersAdd()
 	{
-		$res = $this->userRegister();
-		if($res['error']){
-			return $res;
+		$user_info = $this->form;
+
+		if(isset($user_info['username']) && isset($user_info['password'])){
+			$user = $user_info['username'];
+			$pass = $user_info['password'];
+			if ((strlen($user) < 4) || strlen($pass) < 6){
+				return ['error' => true, 'errorMessage' => 'Username or/and Password is not long enough!'];
+			}
+			$res = $this->db->selectOne("SELECT username FROM auth_user WHERE username=?", array([$user]));
+			if(!empty($res)){
+				return ['error' => true, 'errorType' => 'user-exists', 'errorMessage' => 'User always exists!'];
+			}
+
+			$pass = $this->getPasswordHash($pass);
+			$is_active = 0;
+			if(isset($user_info['actuser']) && $user_info['actuser'] == 'on') $is_active = 1;
+			$query = "INSERT INTO auth_user
+				(username,password,first_name,last_name,is_active,date_joined) VALUES
+				(?,?,?,?,?,datetime('now','localtime'))";
+			$res = $this->db->update($query, [
+				[$user],
+				[$pass],
+				[$user_info['first_name']],
+				[$user_info['last_name']],
+				[$is_active]
+			]);
+			return ['form' => $user_info];
+		} else {
+			return ['error' => true];
 		}
-		return ['form' => $this->form];
 	}
 
-	function ccmd_userRemove()
+	private function ccmd_userRemove()
 	{
 		$id = (int)$this->form['user_id'];
 		if($id > 0){
@@ -262,7 +261,7 @@ class Auth {
 		}
 	}
 
-	function ccmd_userEditInfo()
+	private function ccmd_userEditInfo()
 	{
 		if(!isset($this->form['user_id'])) return ['error' => true, 'error_message' => 'incorrect data!'];
 
@@ -278,22 +277,21 @@ class Auth {
 		];
 	}
 
-	function ccmd_userGetInfo()
+	private function ccmd_userGetInfo()
 	{
 		return $this->db->selectOne("SELECT * FROM auth_user", []); // TODO: What?!
 	}
 
-	function ccmd_login()
-	{
-		return $this->userRegisterCheck($this->form);
-	}
-
 	public static function json_usersGetInfo()
 	{
-		return $this->db->select("select id,username,first_name,last_name,date_joined,last_login,is_active from auth_user order by date_joined desc", []);
+		$db = new Db('clonos');
+		if(!$db->isConnected()){
+			throw new Exception('Could not connect to users database');
+		}
+		return $db->select("select id,username,first_name,last_name,date_joined,last_login,is_active from auth_user order by date_joined desc", []);
 	}
 
-	function getUserName()
+	public function getUserName()
 	{
 		return $this->_user_info['username'];
 	}
