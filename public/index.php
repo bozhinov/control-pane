@@ -113,6 +113,20 @@ switch ($url){
 	case "instance_jail":
 		$tpl->draw('pages/instance_jail.'.$lang);
 		break;
+	case "jailscontainers":
+		if(isset($clonos->uri_chunks[1])){
+			$tpl->assign('chunk', $clonos->uri_chunks[1]);
+			$tpl->draw('dialogs/helpers-add');
+			$tpl->draw('pages/jailscontainers_helper');
+		}
+		$tpl->draw('dialogs/vnc');
+		$tpl->draw('dialogs/jail-settings');
+		$tpl->draw('dialogs/jail-settings-config-menu');
+		$tpl->draw('dialogs/jail-import');
+		$tpl->draw('dialogs/jail-clone');
+		$tpl->draw('dialogs/jail-rename');
+		$tpl->draw('pages/jailscontainers.'.$lang);
+		break;
 	case "k8s":
 		$tpl->draw('dialogs/k8s-new');
 		$tpl->draw('pages/k8s.'.$lang);
@@ -128,6 +142,30 @@ switch ($url){
 		break;
 	case "settings": # TODO
 		$tpl->draw('pages/settings.'.$lang);
+		break;
+	case "sources":
+		$tpl->assign('clonos', $clonos);
+		$tpl->draw('dialogs/src-get');
+		$tpl->draw('pages/sources.'.$lang);
+		break;
+	case "sqlite":
+		$tpl->draw('pages/sqlite.'.$lang);
+		break;
+	case "tasklog":
+		$tpl->draw('dialogs/tasklog');
+		$tpl->draw('pages/tasklog.'.$lang);
+		break;
+	case "users":
+		$tpl->draw('dialogs/users-new');
+		$tpl->draw('pages/users.'.$lang);
+		break;
+	case "vm_packages":
+		$tpl->draw('dialogs/vm_packages-new');
+		$tpl->draw('pages/vm_packages.'.$lang);
+		break;
+	case "vpnet":
+		$tpl->draw('dialogs/vpnet');
+		$tpl->draw('pages/vpnet.'.$lang);
 		break;
 	default:
 		$file_name = 'pages/'.$uri.'/'.$lang.'.index.php';
