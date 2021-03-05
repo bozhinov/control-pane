@@ -13,7 +13,7 @@ $hres = $clonos->getTableChunk('srcslist', 'tbody');
 foreach($nodes as $node){
 
 	$db1 = new Db('base', $node['nodename']);
-	if($db1 !== false){
+	if($db1->isConnected()){
 
 		$bases = $db1->select("SELECT idx,name,platform,ver,rev,date FROM bsdsrc ORDER BY CAST(ver AS int)", []);
 		$num = $nth & 1;
@@ -39,7 +39,7 @@ foreach($nodes as $node){
 					'date' => $base['date'],
 					'jstatus' => '',
 					'icon' => '',
-					'maintenance' => ($idle==0) ? ' maintenance' : '',
+					'maintenance' => ($idle == 0) ? ' maintenance' : '',
 					'deltitle' => $tpl->translate('Delete'),
 					'updtitle' => $tpl->translate('Update')
 				];

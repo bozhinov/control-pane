@@ -23,7 +23,7 @@ class ClonOS
 	public $url_hash = '';
 	public $media_import = '';
 	public $json_req = false;
-	public $_user_info; # Comes from Auth TODO
+	public $username; # Comes from Auth TODO
 	private $_vars = [];
 	private $_locale;
 	private $_db = null;
@@ -554,10 +554,10 @@ class ClonOS
 		$form = $this->_vars['form_data'];
 		$cmd = "task owner=%s mode=new {cbsd_loc} jrename old=%s new=%s host_hostname=%s ip4_addr=%s restart=1";
 		$args = [
-			$this->_user_info['username'], 
-			$form['oldJail'], 
+			$this->username,
+			$form['oldJail'],
 			$form['jname'], 
-			$form['host_hostname'], 
+			$form['host_hostname'],
 			$form['ip4_addr']
 		];
 		$res = CBSD::run($cmd, $args);
@@ -584,10 +584,10 @@ class ClonOS
 		$form = $this->_vars['form_data'];
 		$cmd = 'task owner=%s mode=new {cbsd_loc} jclone checkstate=0 old=%s new=%s host_hostname=%s ip4_addr=%s';
 		$args = [
-			$this->_user_info['username'], 
-			$form['oldJail'], 
+			$this->username,
+			$form['oldJail'],
 			$form['jname'],
-			$form['host_hostname'], 
+			$form['host_hostname'],
 			$form['ip4_addr']
 		];
 		$res = CBSD::run($cmd, $args);
@@ -692,7 +692,7 @@ class ClonOS
 			}
 		}
 
-		$res = CBSD::run('task owner=%s mode=new {cbsd_loc} forms module=%s jname=%s inter=0', [$this->_user_info['username'], $this->url_hash, $jail_name]);
+		$res = CBSD::run('task owner=%s mode=new {cbsd_loc} forms module=%s jname=%s inter=0', [$this->username, $this->url_hash, $jail_name]);
 
 		$err = 'Helper values is saved!';
 		$taskId = -1;
@@ -800,7 +800,7 @@ class ClonOS
 		}
 		file_put_contents($file_name ,$file);
 
-		$res = CBSD::run('task owner=%s mode=new {cbsd_loc} jcreate inter=0 jconf=%s', [$this->_user_info['username'], $file_name]);
+		$res = CBSD::run('task owner=%s mode=new {cbsd_loc} jcreate inter=0 jconf=%s', [$this->username, $file_name]);
 
 		$err = 'Jail is not created!';
 		$taskId = -1;
@@ -967,15 +967,15 @@ class ClonOS
 	{
 		return CBSD::run(
 			'task owner=%s mode=new {cbsd_loc} jstart inter=0 jname=%s',
-			[$this->_user_info['username'], $this->_vars['form_data']['jname']]
+			[$this->username, $this->_vars['form_data']['jname']]
 		); // autoflush=2
 	}
 
 	function ccmd_jailStop()
 	{
 		return CBSD::run(
-			'task owner='.$username.' mode=new {cbsd_loc} jstop inter=0 jname=%s',
-			[$this->_user_info['username'], $this->_vars['form_data']['jname']]
+			'task owner=%s mode=new {cbsd_loc} jstop inter=0 jname=%s',
+			[$$this->username, $this->_vars['form_data']['jname']]
 		); // autoflush=2
 	}
 
@@ -983,7 +983,7 @@ class ClonOS
 	{
 		return CBSD::run(
 			'task owner=%s mode=new {cbsd_loc} jrestart inter=0 jname=%s',
-			[$this->_user_info['username'], $this->_vars['form_data']['jname']]
+			[$this->username, $this->_vars['form_data']['jname']]
 		);	// autoflush=2
 	}
 
@@ -991,7 +991,7 @@ class ClonOS
 	{
 		return CBSD::run(
 			'task owner=%s mode=new {cbsd_loc} jremove inter=0 jname=%s',
-			[$this->_user_info['username'], $this->_vars['form_data']['jname']]
+			[$this->username, $this->_vars['form_data']['jname']]
 		);	// autoflush=2
 	}
 
@@ -1000,7 +1000,7 @@ class ClonOS
 		$form = $this->_vars['form_data'];
 		$res = CBSD::run(
 			'task owner=%s mode=new {cbsd_loc} bclone checkstate=0 old=%s new=%s',
-			[$this->_user_info['username'], $form['oldBhyve'], $form['vm_name']]
+			[$this->username, $form['oldBhyve'], $form['vm_name']]
 		);
 
 		$err = 'Virtual Machine is not renamed!';
@@ -1130,7 +1130,7 @@ class ClonOS
 		$form = $this->_vars['form_data'];
 		$res = CBSD::run(
 			"task owner=%s mode=new /usr/local/bin/cbsd brename old=%s new=%s restart=1",
-			[$this->_user_info['username'], $form['oldJail'], $form['jname']]
+			[$this->username, $form['oldJail'], $form['jname']]
 		);
 
 		$err = 'Virtual Machine is not renamed!';
@@ -1214,7 +1214,7 @@ class ClonOS
 		if(!$db->isConnected()) return false; // TODO: Fix return
 
 		$res = $db->selectOne('SELECT * FROM media WHERE jname=? AND type="iso"', array([$jname]));
-		if($res !== false && !empty($res)){
+		if(!empty($res)){
 			CBSD::run(
 				'cbsd media mode=unregister name="%s" path="%s" jname=%s type=%s',
 				[$res['name'], $res['path'], $jname, $res['type']]
@@ -1223,7 +1223,7 @@ class ClonOS
 				'SELECT * FROM media WHERE idx=?',
 				array([(int)$form['vm_iso_image']])
 			);
-			if($res !== false && !empty($res) && $form['vm_iso_image'] != -2){
+			if(!empty($res) && $form['vm_iso_image'] != -2){
 				CBSD::run(
 					'cbsd media mode=register name="%s" path="%s" jname=%s type=%s',
 					[$res['name'], $res['path'], $jname, $res['type']]
@@ -1281,7 +1281,7 @@ class ClonOS
 				$db = new Db('base','storage_media');
 				if(!$db->isConnected()) return false; // TODO: return error
 				$res = $db->selectOne('SELECT name,path FROM media WHERE idx= ?', array([$iso_id])); // OK, $iso_id is casted as int above.
-				if($res === false || empty($res)) $iso = false;
+				if(empty($res)) $iso = false;
 			}
 			
 			if($iso_id == -1) $iso = false;
@@ -1307,7 +1307,7 @@ class ClonOS
 
 		$res = CBSD::run(
 			'task owner=%s mode=new {cbsd_loc} bcreate inter=0 jconf=%s',
-			[$this->_user_info['username'], $file_name]
+			[$this->username, $file_name]
 		);
 
 		$err = 'Virtual Machine is not created!';
@@ -1402,7 +1402,7 @@ class ClonOS
 			vm_os_profile="%s" imgsize=%s vm_cpus=%s vm_ram=%s vm_os_type=%s mask=%s 
 			ip4_addr=%s ci_ip4_addr=%s ci_gw4=%s ci_user_pubkey="%s" ci_user_pw_user=%s %svnc_password=%s',
 			[
-				$this->_user_info['username'],
+				$this->username,
 				$form['vm_name'],
 				$os_profile,
 				$form['vm_size'],
@@ -1469,7 +1469,7 @@ class ClonOS
 	{
 		return CBSD::run(
 			'task owner=%s mode=new {cbsd_loc} bstart inter=0 jname=%s',
-			[$this->_user_info['username'], $this->form['jname']]
+			[$this->username, $this->form['jname']]
 		);	// autoflush=2
 	}
 
@@ -1477,7 +1477,7 @@ class ClonOS
 	{
 		return CBSD::run(
 			'task owner=%s mode=new {cbsd_loc} bstop inter=0 jname=%s',
-			[$this->_user_info['username'], $this->form['jname']]
+			[$this->username, $this->form['jname']]
 		);	// autoflush=2
 	}
 
@@ -1485,7 +1485,7 @@ class ClonOS
 	{
 		return CBSD::run(
 			'task owner=%s mode=new {cbsd_loc} brestart inter=0 jname=%s',
-			[$this->_user_info['username'], $this->form['jname']]
+			[$this->username, $this->form['jname']]
 		);	// autoflush=2
 	}
 
@@ -1493,7 +1493,7 @@ class ClonOS
 	{
 		return CBSD::run(
 			'task owner=%s mode=new {cbsd_loc} bremove inter=0 jname=%s',
-			[$this->_user_info['username'], $this->form['jname']]
+			[$this->username, $this->form['jname']]
 		);	// autoflush=2
 	}
 
@@ -1583,19 +1583,13 @@ class ClonOS
 		$db = new Db('base', 'storage_media');
 		if(!$db->isConnected()) return ['error' => true, 'res' => 'Database error'];
 
-		$res = $db->selectOne('SELECT * FROM media WHERE idx=?', array([(int)$this->form['media_id'], PDO::PARAM_INT]));
-		if($res === false || empty($res)) return ['error' => true, 'res'=> print_r($res, true)];
+		$db_res = $db->selectOne('SELECT name, path, jname, type FROM media WHERE idx=?', array([(int)$this->form['media_id'], PDO::PARAM_INT]));
+		if(empty($db_res)) return ['error' => true, 'res'=> print_r($res, true)];
 
-		$res = CBSD::run(
-			'media mode=remove name="%s" path="%s" jname="%s" type="%s"', //.$res['name']
-			[$res['name'], $res['path'], $res['jname'], $res['type']]
-		);
+		$res = CBSD::run('media mode=remove name="%s" path="%s" jname="%s" type="%s"', $db_res);
 
 		if($res['error']){
-			$arr['error'] = true;
 			$arr['error_message'] = 'File image was not deleted! '.$res['error_message'];
-		} else {
-			$arr['error'] = false;
 		}
 
 		$arr['media_id'] = $this->form['media_id'];
@@ -1609,8 +1603,8 @@ class ClonOS
 		$ver = str_replace('src', '', $this->formform['jname']);
 		if(empty($ver)) return ['error' => true, 'errorMessage' => 'Version of sources is emtpy!'];
 		return CBSD::run(
-			'task owner='.$username.' mode=new {cbsd_loc} removesrc inter=0 ver=%s jname=#src%s',
-			[$this->_user_info['username'], $ver, $ver]
+			'task owner=%s mode=new {cbsd_loc} removesrc inter=0 ver=%s jname=#src%s',
+			[$this->username, $ver, $ver]
 		);
 	}
 
@@ -1621,7 +1615,7 @@ class ClonOS
 		if(empty($ver)) return ['error' => true, 'errorMessage' => 'Version of sources is emtpy!'];
 		return CBSD::run(
 			'task owner=%s mode=new {cbsd_loc} srcup stable=%s inter=0 ver=%s jname=#src%s',
-			[$this->_user_info['username'], $stable, $ver, $ver]
+			[$this->username, $stable, $ver, $ver]
 		);
 	}
 
@@ -1670,7 +1664,7 @@ class ClonOS
 
 		return $this->CBSD::run(
 			'task owner=%s mode=new {cbsd_loc} removebase inter=0 stable=%s ver=%s arch=%s jname=#%s',
-			[$this->_user_info['username'], $stable, $ver, $arch, $this->form['jname']]
+			[$this->username, $stable, $ver, $arch, $this->form['jname']]
 		);
 	}
 
@@ -1696,7 +1690,7 @@ class ClonOS
 
 		$res = CBSD::run(
 			'task owner=%s mode=new {cbsd_loc} world inter=0 stable=%s ver=%s jname=#base%s',
-			[$this->_user_info['username'], $res['stable'], $ver, $bid]
+			[$this->username, $res['stable'], $ver, $bid]
 		);
 
 		$err = '';
@@ -1810,7 +1804,7 @@ class ClonOS
 
 		$res = CBSD::run(
 			'task owner=%s mode=new {cbsd_loc} repo action=get sources=base inter=0 stable=%s ver=%s jname=#base%s',
-			[$this->_user_info['username'], $stable_num, $ver, $bid]
+			[$this->username, $stable_num, $ver, $bid]
 		);
 
 		$err = '';
@@ -1873,7 +1867,7 @@ class ClonOS
 	{
 		$db1 = new Db('base', 'local');
 		$list = [];
-		if($db1 !== false){
+		if($db1->isConnected()){
 			$bases = $db1->select("SELECT idx,platform,ver FROM bsdsrc order by cast(ver AS int)", []);
 
 			foreach($bases as $base){
@@ -1894,7 +1888,7 @@ class ClonOS
 		foreach($helpers as $helper){
 			$res = CBSD::run(
 				'task owner=%s mode=new {cbsd_loc} forms inter=0 module=%s jname=%s',
-				[$this->_user_info['username'], $helper, $jail_id]
+				[$this->username, $helper, $jail_id]
 			);
 		}
 		return ['error' => false];
@@ -2141,11 +2135,11 @@ class ClonOS
 	function fileSizeConvert(int $bytes, $bytes_in_mb = 1024, $round = false, $small = false)
 	{
 		$arBytes = [
-			0 => ["tb", pow($bytes_in_mb, 4)],
-			1 => ["gb", pow($bytes_in_mb, 3)],
-			2 => ["mb", pow($bytes_in_mb, 2)],
-			3 => ["kb", $bytes_in_mb],
-			4 => ["b", 1]
+			["tb", pow($bytes_in_mb, 4)],
+			["gb", pow($bytes_in_mb, 3)],
+			["mb", pow($bytes_in_mb, 2)],
+			["kb", $bytes_in_mb],
+			["b", 1]
 		];
 
 		$result = '0 MB';
@@ -2175,21 +2169,14 @@ class ClonOS
 	function media_iso_list()
 	{
 		$db = new Db('base','storage_media');
-		$res = $db->select('select * from media where type="iso"', []);
-		if($res === false || empty($res)) return;
-
-		$list = [];
-		foreach($res as $r){
-			$list[] = [$r['idx'], $r['name'], $r['type']];
-		}
-		return $list;
+		return $db->select('select idx, name, type from media where type="iso"', []);
 	}
 
 	function ccmd_updateBhyveISO($iso = '')
 	{
 		$db = new Db('base', 'storage_media');
 		$res = $db->select('SELECT * FROM media WHERE type="iso"', []);
-		if($res === false || empty($res)) return [];
+		if(empty($res)) return [];
 
 		$sel = '';
 		$html = '<option value="-2"></option><option value="-1"#sel#>Profile default ISO</option>';
@@ -2219,7 +2206,6 @@ class ClonOS
 	{
 		$db = new Db('base', 'local');
 		if(!$db->isConnected()) return $this->messageError('data incorrect!');
-		$owner = $this->_user_info['username'];
 		$query = "INSERT INTO vmpackages (name,description,pkg_vm_ram,pkg_vm_disk,pkg_vm_cpus,owner,timestamp)
 			VALUES (?,?,?,?,?,?,datetime('now','localtime'))";
 
@@ -2229,7 +2215,7 @@ class ClonOS
 			[$this->form['pkg_vm_ram']],
 			[$this->form['pkg_vm_disk']],
 			[$this->form['pkg_vm_cpus']],
-			[$owner]
+			[$this->username]
 		]);
 
 		if($res['error'] == false){
@@ -2271,7 +2257,7 @@ class ClonOS
 			[$this->form['pkg_vm_ram'],  PDO::PARAM_STR],
 			[$this->form['pkg_vm_disk'], PDO::PARAM_STR],
 			[$this->form['pkg_vm_cpus'], PDO::PARAM_STR],
-			[$this->_user_info['username'], PDO::PARAM_STR],
+			[$this->username, PDO::PARAM_STR],
 			[(int)$id, PDO::PARAM_INT]
 		]);
 		if($res !== false) return $this->messageSuccess($res);
@@ -2282,7 +2268,7 @@ class ClonOS
 	function ccmd_vmTemplateRemove()
 	{
 		$id = $this->form['template_id'];
-		if(!is_numeric($id) || (int)$id <= 0) return $this->messageError('wrong data!');
+		if((int)$id <= 0) return $this->messageError('wrong data!');
 
 		$db = new Db('base','local');
 		if(!$db->isConnected()) return $this->messageError('DB connection error!');
@@ -2396,7 +2382,7 @@ class ClonOS
 
 		return CBSD::run(
 			'task owner=%s mode=new {cbsd_loc} jexport gensize=1 jname=%s dstdir=%s',
-			[$this->_user_info['username'], $jname, $this->media_import]
+			[$this->username, $jname, $this->media_import]
 		);
 	}
 
@@ -2408,7 +2394,7 @@ class ClonOS
 		if($res === false) return $this->messageError('File not found!');
 
 		$cmd = 'task owner=%s mode=new {cbsd_loc} jimport ';
-		$attrs = [$this->_user_info['username']];
+		$attrs = [$this->username];
 
 		if($jname != $res['orig_jname']) {
 			$cmd .= 'new_jname=%s ';
@@ -2435,7 +2421,7 @@ class ClonOS
 	{
 		return CBSD::run(
 			'task owner=%s mode=new {cbsd_loc} imgremove path=%s img=$s',
-			[$this->_user_info['username'], $this->media_import, $this->form['jname']]
+			[$this->username, $this->media_import, $this->form['jname']]
 		);
 	}
 
@@ -2542,10 +2528,10 @@ class ClonOS
 	function authkeys_list()
 	{
 		$db = new Db('base','authkey');
-		$res = $db->select('SELECT idx,name FROM authkey;', array());
+		$res = $db->select('SELECT idx,name FROM authkey;', []);
 
 		$list = [];
-		if(!empty($res))foreach($res as $item){
+		foreach($res as $item){
 			$list[item['idx']] = $item['name'];
 		}
 		return $list;
@@ -2554,7 +2540,7 @@ class ClonOS
 	function vm_packages_list()
 	{
 		$db = new Db('base','local');
-		$res = $db->select('select id,name,description,pkg_vm_ram,pkg_vm_disk,pkg_vm_cpus,owner from vmpackages order by name asc;', array());
+		$res = $db->select('select id,name,description,pkg_vm_ram,pkg_vm_disk,pkg_vm_cpus,owner from vmpackages order by name asc;', []);
 
 		$html = [];
 		$min = 0;

@@ -9,7 +9,7 @@ $auth = new Auth();
 $uri = trim($_SERVER['REQUEST_URI'], '/');
 $chunks = Utils::gen_uri_chunks($uri);
 $clonos = new ClonOS($chunks);
-$clonos->_user_info = $auth->_user_info; # TODO: Fix this
+$clonos->username = $auth->getUserName();
 
 $tpl = new Tpl();
 $lang = $tpl->get_lang();
@@ -40,7 +40,7 @@ $tpl->assign([
 	"user_info" => $auth->_user_info,
 	"title" => Config::get_title($active),
 	"uri" => $uri,
-	"isDev" => (getenv('APPLICATION_ENV') == 'development'), # TODO: Move to SESSION
+	"isDev" => (getenv('APPLICATION_ENV') == 'development'),
 	"lang" => $lang,
 	"langs" => Config::$languages,
 	"menu_active" => $active,

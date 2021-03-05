@@ -1,11 +1,10 @@
 <?php
 
-$username = $clonos->_user_info['username'];
 $db = new Db('base', 'cbsdtaskd');
-$res = $db->select("SELECT id,st_time,end_time,cmd,status,errcode,logfile FROM taskd WHERE owner='?' ORDER BY id DESC", array([$username]));
+$res = $db->select("SELECT id,st_time,end_time,cmd,status,errcode,logfile FROM taskd WHERE owner='?' ORDER BY id DESC", array([$auth->getUserName()]));
 $html = '';
 
-if($res !== false){
+if(count($res) > 0){
 	$nth = 0;
 	$num = $nth & 1;
 

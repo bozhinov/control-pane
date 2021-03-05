@@ -10,8 +10,8 @@ $ids = [];
 $nth = 0;
 $hres = $clonos->getTableChunk('baseslist','tbody');
 foreach($nodes as $node){
-	$db1 = new Db('base',$node['nodename']);
-	if($db1 !== false){
+	$db1 = new Db('base', $node['nodename']);
+	if($db1->isConnected()){
 		$bases = $db1->select("SELECT idx,platform,name,arch,targetarch,ver,stable,elf,date FROM bsdbase order by cast(ver AS int)", []);
 		$num = $nth & 1;
 		foreach($bases as $base){
@@ -48,7 +48,7 @@ foreach($nodes as $node){
 				$html .= $html_tpl;
 			}
 
-			$ids[]='#'.$id;
+			$ids[] = '#'.$id;
 		}
 
 		$nth++;

@@ -6,6 +6,7 @@ class Auth {
 	public $authorized = false;
 	public $_user_info = [
 		'id' => 0,
+		'error' => false,
 		'username' => 'guest'
 	];
 	private $db;
@@ -267,13 +268,9 @@ class Auth {
 		return $this->db->selectOne("SELECT * FROM auth_user", []); // TODO: What?!
 	}
 
-	public static function json_usersGetInfo()
+	public function json_usersGetInfo()
 	{
-		$db = new Db('clonos');
-		if(!$db->isConnected()){
-			throw new Exception('Could not connect to users database');
-		}
-		return $db->select("select id,username,first_name,last_name,date_joined,last_login,is_active from auth_user order by date_joined desc", []);
+		return $this->db->select("select id,username,first_name,last_name,date_joined,last_login,is_active from auth_user order by date_joined desc", []);
 	}
 
 	public function getUserName()

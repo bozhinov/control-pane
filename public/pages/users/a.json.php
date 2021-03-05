@@ -12,7 +12,7 @@ date_joined TIMESTAMP DATE DEFAULT (datetime('now','localtime'))
 );
 */
 
-$res = Auth::json_usersGetInfo();
+$res = $auth->json_usersGetInfo();
 $html = '';
 $nth = 0;
 # TODO: refactor this with Tpl

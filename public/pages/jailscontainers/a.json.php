@@ -22,7 +22,7 @@ $hres = $clonos->getTableChunk('jailslist','tbody');
 
 foreach($nodes as $node){
 	$db1 = new Db('base',$node);
-	if($db1 !== false){
+	if($db1->isConnected()){
 		$jails = $db1->select("SELECT jname,ip4_addr,status,protected FROM jails WHERE emulator!='bhyve' and hidden!=1 order by jname asc;", []);
 		$allnodes[$node] = $jails;
 

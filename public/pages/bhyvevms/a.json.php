@@ -16,7 +16,7 @@ $hres = $clonos->getTableChunk('bhyveslist','tbody');
 
 foreach($nodes as $node){
 	$db1 = new Db('base', $node);
-	if($db1 !== false){
+	if($db1->isConnected()){
 		$bhyves = $db1->select("SELECT jname,vm_ram,vm_cpus,vm_os_type,hidden,protected,bhyve_vnc_tcp_bind FROM bhyve where hidden!=1 order by jname asc;", []);
 		$num = $nth & 1;
 

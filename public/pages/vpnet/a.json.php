@@ -1,10 +1,12 @@
 <?php
 
 $db = new Db('base', 'vpnet');
-$res = $db->select('SELECT idx,name,vpnet FROM vpnet', []);
+if($db->isConnected()){
+	$res = $db->select('SELECT idx,name,vpnet FROM vpnet', []);
+}
 $html = '';
 
-if($res !== false){
+if(count($res) > 0){
 	$nth = 0;
 	$num = $nth & 1;
 
