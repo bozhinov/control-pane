@@ -1,7 +1,5 @@
 <?php
 
-require_once("../php/cbsd.php");
-
 $hash = $this->url_hash;
  
 $db_path = false;

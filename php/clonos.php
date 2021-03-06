@@ -69,8 +69,9 @@ class ClonOS
 			}
 		}
 
-		$this->validate->add_default('hash', '');
-		$this->url_hash == $this->validate->these([['path', 3]]);
+		# otherwise will fail validation. will trim it later
+		$this->validate->add_default('hash', ' ');
+		$this->url_hash == $this->validate->these([['hash', 3]]);
 		$this->url_hash = preg_replace('/^#/', '', $this->url_hash);
 
 		$form_data = (isset($_POST['form_data'])) ? $_POST['form_data'] : [];

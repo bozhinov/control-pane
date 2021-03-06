@@ -1,5 +1,5 @@
 <?php
-$hash = $clonos->url_hash;
+$hash = trim($clonos->url_hash);
 if(empty($hash)){
 #	Узнаём список хелперов
 	$jails_helpers = [];

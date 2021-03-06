@@ -1,6 +1,8 @@
 <?php
 
-if(!empty($clonos->url_hash)){
+# have to trim it cause of validation
+# default value is 1 x Space
+if(!empty(trim($clonos->url_hash))){
 	include('helpers.php');
 	return;
 }
@@ -32,7 +34,7 @@ if($res['retval'] == 0){
 		if(in_array($item, $sys_helpers)){
 			$description = '';
 			$db = new Db('helper', $item);
-			if($db !== false){
+			if($db !== false){ # TODO - clean this up
 				if($db->error){
 					$file_name = $db->getFileName();
 					if(!file_exists($file_name)){
