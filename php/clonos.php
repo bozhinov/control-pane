@@ -1,15 +1,13 @@
 <?php
 
-require_once("cbsd.php");
-require_once('config.php');
+# TODO: Needed form validation
+
 require_once('localization.php');
-require_once('db.php');
 require_once('forms.php');
 require_once('utils.php');
 
 class ClonOS 
 {
-	public $server_name = '';
 	public $workdir = '';
 	public $mode = null;
 	public $form = '';
@@ -52,12 +50,6 @@ class ClonOS
 		if($this->environment == 'development'){
 			$sentry_file = '../php/sentry.php';
 			if(file_exists($sentry_file)) include($sentry_file);
-		}
-
-		if(isset($_SERVER['SERVER_NAME']) && !empty(trim($_SERVER['SERVER_NAME']))){
-			$this->server_name = $_SERVER['SERVER_NAME'];
-		} else {
-			$this->server_name = $_SERVER['SERVER_ADDR'];
 		}
 
 		if (is_null($uri_chunks)) { # TODO Do we need this ?
@@ -1128,6 +1120,7 @@ class ClonOS
 	function ccmd_bhyveRename()
 	{
 		$form = $this->_vars['form_data'];
+		# TODO validate oldJail & jname
 		$res = CBSD::run(
 			"task owner=%s mode=new /usr/local/bin/cbsd brename old=%s new=%s restart=1",
 			[$this->username, $form['oldJail'], $form['jname']]
@@ -1154,14 +1147,17 @@ class ClonOS
 	{
 		$res = [];
 		$form = $this->_vars['form_data'];
+		# TODO validate jail_id & dialog
 		if(!isset($form['jail_id'])) return ['error' => true, 'error_message' => 'Bad jail id!'];
 
 		$jname = $form['jail_id'];
 		$err = false;
 		$db = new Db('base','local');
 		if($db->isConnected()){
-			$query = "SELECT jname,vm_ram,vm_cpus,vm_os_type,hidden FROM bhyve WHERE jname=?"; //ip4_addr
-			$res['vars'] = $db->selectOne($query, array([$jname]));
+			$res['vars'] = $db->selectOne(
+				"SELECT jname,vm_ram,vm_cpus,vm_os_type,hidden FROM bhyve WHERE jname=?", [
+				[$jname]
+			]);
 		} else {
 			$err = true;
 		}
@@ -1170,15 +1166,15 @@ class ClonOS
 
 		if($err){
 			$res['error'] = true;
-			$res['error_message'] = $this->_locale->translate('Jail '.$form['jail_id'].' is not present.'); // XSS 
-			$res['jail_id'] = $form['jail_id']; // TODO Possible XSS
+			$res['error_message'] = $this->_locale->translate('Jail '.$jname.' is not present.');
+			$res['jail_id'] = $jname;
 //			$res['reload']=true;
 			return $res;
 		}
 
 		$res['error'] = false;
-		$res['dialog'] = $form['dialog']; // Possible XSS
-		$res['jail_id'] = $form['jail_id'];
+		$res['dialog'] = $form['dialog'];
+		$res['jail_id'] = $jname;
 		return $res;
 	}
 
