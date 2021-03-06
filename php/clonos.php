@@ -1,7 +1,5 @@
 <?php
 
-# TODO: Needed form validation
-
 require_once('localization.php');
 require_once('forms.php');
 require_once('utils.php');
@@ -10,7 +8,6 @@ class ClonOS
 {
 	public $workdir = '';
 	public $mode = null;
-	public $form = '';
 	public $environment = '';
 	public $realpath = '';
 	public $realpath_public = '';
@@ -20,7 +17,6 @@ class ClonOS
 	public $url_hash = '';
 	public $media_import = '';
 	public $username; # Comes from Auth
-	private $validate;
 	private $form_validate;
 	private $_vars = [];
 	private $_locale;
@@ -59,7 +55,6 @@ class ClonOS
 		$this->config = new Config();
 		# TODO by the end of all this we shouldn't need locale here
 		$this->_locale = new Localization($this->realpath_public);
-		$this->validate = new Validate($_POST);
 
 		if(isset($_POST['path'])){ # TODO Do we need this or just json?
 			$this->realpath_page = $this->realpath_public.'pages/'.$this->uri_chunks[0].'/';
@@ -69,10 +64,11 @@ class ClonOS
 			}
 		}
 
-		# otherwise will fail validation. will trim it later
-		$this->validate->add_default('hash', ' ');
-		$this->url_hash == $this->validate->these(['hash' => 3]);
-		$this->url_hash = preg_replace('/^#/', '', $this->url_hash);
+		if (isset($_POST['hash'])){
+			$this->url_hash == $_POST['hash'];
+			Validate::short_string($this->url_hash);
+			$this->url_hash = preg_replace('/^#/', '', $this->url_hash);
+		}
 
 		$form_data = (isset($_POST['form_data'])) ? $_POST['form_data'] : [];
 		$this->form_validate = new Validate($form_data);
@@ -2433,7 +2429,7 @@ class ClonOS
 			return ['error' => true, 'errorMessage' => 'Bad data!'];
 		}
 		$jail_name = $form['jname'];
-		$res = ['jname' = > $jail_name];
+		$res = ['jname' => $jail_name];
 
 		$db = new Db('racct', ['jname' => $jail_name]);
 		if($db->isConnected()){
