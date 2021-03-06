@@ -10,7 +10,6 @@ class Auth {
 		'username' => 'guest'
 	];
 	private $db;
-	private $form = [];
 	private $_client_ip = '';
 
 	function __construct()
@@ -20,7 +19,8 @@ class Auth {
 			throw new Exception('Could not connect to users database');
 		}
 		$this->_client_ip = $_SERVER['REMOTE_ADDR'];
-		(isset($_REQUEST['form_data'])) AND $this->form = $_REQUEST['form_data'];
+		$f = (isset($_REQUEST['form_data'])) ? $_REQUEST['form_data'] : [];
+		$this->validate = new Validate($f);
 
 		if(isset($_COOKIE['mhash'])){ # TODO table 'auth_list' needs to be stored in memory not sqlite
 			$query = "SELECT au.id,au.username FROM auth_user au, auth_list al WHERE al.secure_sess_id=? AND au.id=al.user_id AND au.is_active=1";
@@ -100,47 +100,52 @@ class Auth {
 			[secure_sess_id] => 
 		)
 		*/
-		if(isset($this->form['login']) && isset($this->form['password'])){
-			$pass = $this->getPasswordHash($this->form['password']);
-			$res = $this->db->selectOne(
-				"SELECT id, username, password FROM auth_user WHERE username=? AND is_active=1", [
-				[$this->form['login']]
+		try {
+			$form = $this->validate([
+				['login', 3],
+				['password', 5]
 			]);
-			if(empty($res) || $res['password'] != $pass){
-				//sleep(3); # TODO Why?
-				return ['errorCode' => 1,'message' => 'user not found!'];
-			}
-			$res['errorCode'] = 0;
-			unset($res['password']);  // no need to get this outside of this function
-
-			$id = (int)$res['id'];
-			$memory_hash = md5($id.$res['username'].time());
-			$secure_memory_hash = md5($memory_hash.$this->_client_ip);
-
-			$qres = $this->db->update(
-				"UPDATE auth_list SET sess_id=?,secure_sess_id=?,auth_time=datetime('now','localtime') WHERE user_id=? AND user_ip=?", [
-				[$memory_hash],
-				[$secure_memory_hash],
-				[$id],
-				[$this->_client_ip]
-			]);
-
-			if(isset($qres['rowCount'])){
-				if($qres['rowCount'] == 0){
-					$qres = $this->db->insert(
-						"INSERT INTO auth_list (user_id,sess_id,secure_sess_id,user_ip,auth_time) VALUES (?,?,?,?,datetime('now','localtime'))", [
-						[$id],
-						[$memory_hash],
-						[$secure_memory_hash],
-						[$this->_client_ip]
-					]);
-				}
-			}
-
-			setcookie('mhash', $memory_hash, time() + 1209600); # 20min
-		} else {
-			$res = ['message' => 'unregistered user', 'errorCode' => 1];
+		} catch (Exception){
+			return ['message' => 'unregistered user', 'errorCode' => 1];
 		}
+
+		$pass = $this->getPasswordHash($form['password']);
+		$res = $this->db->selectOne(
+			"SELECT id, username, password FROM auth_user WHERE username=? AND is_active=1", [
+			[$form['login']]
+		]);
+		if(empty($res) || $res['password'] != $pass){
+			//sleep(3); # TODO Why?
+			return ['errorCode' => 1,'message' => 'user not found!'];
+		}
+		$res['errorCode'] = 0;
+		unset($res['password']);  // no need to get this outside of this function
+
+		$id = (int)$res['id'];
+		$memory_hash = md5($id.$res['username'].time());
+		$secure_memory_hash = md5($memory_hash.$this->_client_ip);
+
+		$qres = $this->db->update(
+			"UPDATE auth_list SET sess_id=?,secure_sess_id=?,auth_time=datetime('now','localtime') WHERE user_id=? AND user_ip=?", [
+			[$memory_hash],
+			[$secure_memory_hash],
+			[$id],
+			[$this->_client_ip]
+		]);
+
+		if(isset($qres['rowCount'])){
+			if($qres['rowCount'] == 0){
+				$qres = $this->db->insert(
+					"INSERT INTO auth_list (user_id,sess_id,secure_sess_id,user_ip,auth_time) VALUES (?,?,?,?,datetime('now','localtime'))", [
+					[$id],
+					[$memory_hash],
+					[$secure_memory_hash],
+					[$this->_client_ip]
+				]);
+			}
+		}
+
+		setcookie('mhash', $memory_hash, time() + 1209600); # 20min
 
 		return $res;
 	}
@@ -148,19 +153,23 @@ class Auth {
 	private function ccmd_usersEdit()
 	{
 		# TODO: This function has 6 exits
-		if(!isset($this->form['user_id']) {
+		try {
+			$this->validate->add_default('actuser', 'off');
+			$form = $this->validate([
+				['user_id', 2], # non-zero int
+				['username', 3],
+				['password', 5],
+				['first_name', 4],
+				['last_name', 4],
+				['actuser', 33] # Non mandatory
+			]);
+		} catch (Exception){
 			return ['error' => true, 'error_message' => 'incorrect data!'];
-		} else {
-			$user_id = (int)$form['user_id'];
 		}
 
-		$username = $this->form['username'];
-		$first_name = $this->form['first_name'];
-		$last_name = $this->form['last_name'];
-		$is_active = 0;
-		if(isset($this->form['actuser']) && $this->form['actuser'] == 'on') $is_active = 1;
-
+		$is_active = ($form['actuser'] == 'on') ? 1 : 0;
 		$authorized_user_id = 0;
+
 		if(isset($_COOKIE['mhash'])){
 			$mhash = $_COOKIE['mhash'];
 			if(!preg_match('#^[a-f0-9]{32}$#', $mhash)){
@@ -176,29 +185,26 @@ class Auth {
 			return ['error' => true, 'error_message' => 'you must be authorized for this operation!'];
 		}
 
-		if($user_id == 0 || $user_id != $authorized_user_id){
+		if($form['user_id'] != $authorized_user_id){
 			return ['error' => true, 'error_message' => 'I think you\'re some kind of hacker'];
 		}
 
-		if(isset($this->form['password'])){
-			$password = $this->getPasswordHash($this->form['password']);
-			$query = "UPDATE auth_user SET username=?,password=?,first_name=?,last_name=?,is_active=? WHERE id=?";
-			$res = $this->db->update($query, [
-				[$username],
-				[$password],
-				[$first_name],
-				[$last_name],
+		if(isset($form['password'])){
+			$res = $this->db->update("UPDATE auth_user SET username=?,password=?,first_name=?,last_name=?,is_active=? WHERE id=?", [
+				[$form['username']],
+				[$this->getPasswordHash($form['password'])],
+				[$form['first_name']],
+				[$form['last_name']],
 				[$is_active],
-				[$user_id]
+				[$form['user_id']]
 			]);
 		} else {
-			$query = "UPDATE auth_user SET username=?,first_name=?,last_name=?,is_active=? WHERE id=?";
-			$res = $this->db->update($query, [
-				[$username],
-				[$first_name],
-				[$last_name],
+			$res = $this->db->update("UPDATE auth_user SET username=?,first_name=?,last_name=?,is_active=? WHERE id=?" [
+				[$form['username']],
+				[$form['first_name']],
+				[$form['last_name']],
 				[$is_active],
-				[$user_id]
+				[$form['user_id']]
 			]);
 		}
 		return ['error' => false, 'res' => $res];
@@ -206,57 +212,68 @@ class Auth {
 
 	private function ccmd_usersAdd()
 	{
-		if(isset($this->form['username']) && isset($this->form['password'])){
-			$user = $this->form['username'];
-			$pass = $this->form['password'];
-			if ((strlen($user) < 4) || strlen($pass) < 6){
-				return ['error' => true, 'errorMessage' => 'Username or/and Password is not long enough!'];
-			}
-			$res = $this->db->selectOne("SELECT username FROM auth_user WHERE username=?", array([$user]));
-			if(!empty($res)){
-				return ['error' => true, 'errorType' => 'user-exists', 'errorMessage' => 'User always exists!'];
-			}
-
-			$pass = $this->getPasswordHash($pass);
-			$is_active = 0;
-			if(isset($this->form['actuser']) && $this->form['actuser'] == 'on') $is_active = 1;
-			$query = "INSERT INTO auth_user
-				(username,password,first_name,last_name,is_active,date_joined) VALUES
-				(?,?,?,?,?,datetime('now','localtime'))";
-			$res = $this->db->update($query, [
-				[$user],
-				[$pass],
-				[$this->form['first_name']],
-				[$this->form['last_name']],
-				[$is_active]
+		try {
+			$this->validate->add_default('actuser', 'off');
+			$form = $this->validate([
+				['username', 3],
+				['password', 5],
+				['first_name', 4],
+				['last_name', 4],
+				['actuser', 3]
 			]);
-			return ['form' => $this->form];
-		} else {
-			return ['error' => true];
+		} catch (Exception){
+			return ['error' => true, 'error_message' => 'incorrect data!'];
 		}
+
+		$res = $this->db->selectOne("SELECT username FROM auth_user WHERE username=?", array([$form['username']]));
+		if(!empty($res)){
+			return ['error' => true, 'errorType' => 'user-exists', 'errorMessage' => 'User always exists!'];
+		}
+
+		$is_active = ($form['actuser'] == 'on') ? 1 : 0;
+		$res = $this->db->update("INSERT INTO auth_user (username,password,first_name,last_name,is_active,date_joined) VALUES (?,?,?,?,?,datetime('now','localtime'))", [
+			[$form['username']],
+			[$this->getPasswordHash($form['password'])],
+			[$form['first_name']],
+			[$form['last_name']],
+			[$is_active]
+		]);
+
+		return ['form' => $form];
 	}
 
 	private function ccmd_userRemove()
 	{
-		$id = (int)$this->form['user_id'];
-		if($id > 0){
-			return $this->db->select("DELETE FROM auth_user WHERE id=?", array([$id, PDO::PARAM_INT]));
+		try {
+			$form = $this->validate([
+				['user_id', 1] # non-zero int
+			]);
+		} catch (Exception){
+			return ['error' => true, 'error_message' => 'incorrect data!'];
 		}
+
+		return $this->db->select("DELETE FROM auth_user WHERE id=?", array([$form['user_id'], PDO::PARAM_INT]));
 	}
 
 	private function ccmd_userEditInfo()
 	{
-		if(!isset($this->form['user_id'])) return ['error' => true, 'error_message' => 'incorrect data!'];
+		try {
+			$form = $this->validate([
+				['user_id', 1], # non-zero int
+				['tbl_id'], 3],
+				['dialog'], 4] # TODO - THIS WILL FAIL
+			]);
+		} catch (Exception){
+			return ['error' => true, 'error_message' => 'incorrect data!'];
+		}
 
-		$user_id = (int)$this->form['user_id'];
-
-		$res = $this->db->selectOne("SELECT username,first_name,last_name,is_active AS actuser FROM auth_user WHERE id=?", array([$user_id]));
+		$res = $this->db->selectOne("SELECT username,first_name,last_name,is_active AS actuser FROM auth_user WHERE id=?", array([[$form['user_id']]));
 		return [
-			'dialog' => $this->form['dialog'],
+			'dialog' => $form['dialog'], # TODO . this is not OK
 			'vars' => $res,
 			'error' => false,
-			'tblid' => $this->form['tbl_id'],
-			'user_id' => $user_id
+			'tblid' => $form['tbl_id'],
+			'user_id' => [$form['user_id']
 		];
 	}
 

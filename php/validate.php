@@ -2,11 +2,28 @@
 
 class Validate {
 
-	public function form(array $list, array $form)
+	private $f;
+
+	function __construct(array $form)
 	{
+		$this->f = $form;
+	}
+
+	public function add_default($key, $val)
+	{
+		// NOTE this appends to f and it will stay there
+		$this->f[$key] = $val;
+	}
+
+	public function form(array $list)
+	{
+		if (empty($this->f) {
+			throw new Exception("Form data is empty");
+		}
+
 		foreach($list as $e => $type){
-			if (!isset($form[$e])){
-				throw new Exception('$e." is not set in form');
+			if (!isset($this->f[$e])){
+				throw new Exception($e.' is not set in form');
 			}
 		}
 
@@ -14,40 +31,44 @@ class Validate {
 
 			switch($type){
 				case 1: # INT
-					$e = (int)$e;
+					$list[$e] = (int)$this->f[$e];
 					break;
 				case 2: # INT 0 not accepted
-					$e = (int)$e;
-					if($e == 0){
-						throw new Exception('$e." can't be 0");
+					$list[$e] = (int)$this->f[$e];
+					if($list[$e] == 0){
+						throw new Exception($e." can't be 0");
 					}
 					break;
 				case 3: # SHORT STRING
 					if (filter_var($e, FILTER_SANITIZE_STRING) != $e){
 						throw new Exception($e." string did not pass the validation");
 					}
-					$len = strlen($e);
+					$len = strlen($this->f[$e]);
 					if ($len < 1 || $len > 20){
 						throw new Exception($e." string did not pass the lenght validation");
 					}
+					$list[$e] = $this->f[$e];
 					break;
 				case 4: # LONG STRING
 					if (filter_var($e, FILTER_SANITIZE_STRING) != $e){
 						throw new Exception($e." string did not pass the validation");
 					}
-					$len = strlen($e);
+					$len = strlen($this->f[$e]);
 					if ($len < 1 || $len > 150){
 						throw new Exception($e." string did not pass the lenght validation");
 					}
+					$list[$e] = $this->f[$e];
 					break;
-				case 5: # STRING WITH SPECIAL
+				case 5: # STRING WITH SPECIAL CHARS
 					if (filter_var($e, FILTER_SANITIZE_SPECIAL_CHARS) != $e){
 						throw new Exception($e." string did not pass the validation");
 					}
-					$len = strlen($e);
+					$len = strlen($this->f[$e]);
 					if ($len < 1 || $len > 20){
 						throw new Exception($e." string did not pass the lenght validation");
 					}
+					$list[$e] = $this->f[$e];
+					break;
 			}
 
 			switch($e){
@@ -58,6 +79,8 @@ class Validate {
 					break;
 			}
 		}
+
+		return $list;
 	}
 
 }
