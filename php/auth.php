@@ -22,7 +22,7 @@ class Auth {
 		$this->_client_ip = $_SERVER['REMOTE_ADDR'];
 		(isset($_REQUEST['form_data'])) AND $this->form = $_REQUEST['form_data'];
 
-		if(isset($_COOKIE['mhash'])){
+		if(isset($_COOKIE['mhash'])){ # TODO table 'auth_list' needs to be stored in memory not sqlite
 			$query = "SELECT au.id,au.username FROM auth_user au, auth_list al WHERE al.secure_sess_id=? AND au.id=al.user_id AND au.is_active=1";
 			$res = $this->db->selectOne($query, array([md5($_COOKIE['mhash'].$this->_client_ip)]));
 			if(isset($res['id'])){
@@ -100,26 +100,25 @@ class Auth {
 			[secure_sess_id] => 
 		)
 		*/
-		$user_info = $this->form;
-		if(empty($user_info)) return ['errorCode' => 1,'message' => 'empty user info!'];
-
-		if(isset($user_info['login']) && isset($user_info['password'])){
-			$pass = $this->getPasswordHash($user_info['password']);
-			$res = $this->db->selectOne("SELECT id,username,password FROM auth_user WHERE username=? AND is_active=1", array([$user_info['login']]));
+		if(isset($this->form['login']) && isset($this->form['password'])){
+			$pass = $this->getPasswordHash($this->form['password']);
+			$res = $this->db->selectOne(
+				"SELECT id, username, password FROM auth_user WHERE username=? AND is_active=1", [
+				[$this->form['login']]
+			]);
 			if(empty($res) || $res['password'] != $pass){
 				//sleep(3); # TODO Why?
 				return ['errorCode' => 1,'message' => 'user not found!'];
 			}
 			$res['errorCode'] = 0;
+			unset($res['password']);  // no need to get this outside of this function
 
 			$id = (int)$res['id'];
 			$memory_hash = md5($id.$res['username'].time());
 			$secure_memory_hash = md5($memory_hash.$this->_client_ip);
 
-			$query = "UPDATE auth_list 
-					SET sess_id=?,secure_sess_id=?,auth_time=datetime('now','localtime') 
-					WHERE user_id=? AND user_ip=?";
-			$qres = $this->db->update($query, [
+			$qres = $this->db->update(
+				"UPDATE auth_list SET sess_id=?,secure_sess_id=?,auth_time=datetime('now','localtime') WHERE user_id=? AND user_ip=?", [
 				[$memory_hash],
 				[$secure_memory_hash],
 				[$id],
@@ -128,10 +127,8 @@ class Auth {
 
 			if(isset($qres['rowCount'])){
 				if($qres['rowCount'] == 0){
-					$query = "INSERT INTO auth_list
-						(user_id,sess_id,secure_sess_id,user_ip,auth_time) VALUES
-						(?,?,?,?,datetime('now','localtime'))";
-					$qres = $this->db->insert($query, [
+					$qres = $this->db->insert(
+						"INSERT INTO auth_list (user_id,sess_id,secure_sess_id,user_ip,auth_time) VALUES (?,?,?,?,datetime('now','localtime'))", [
 						[$id],
 						[$memory_hash],
 						[$secure_memory_hash],
@@ -141,32 +138,34 @@ class Auth {
 			}
 
 			setcookie('mhash', $memory_hash, time() + 1209600); # 20min
-
-			return $res;
+		} else {
+			$res = ['message' => 'unregistered user', 'errorCode' => 1];
 		}
-		return ['message' => 'unregistered user', 'errorCode' => 1];
+
+		return $res;
 	}
 
 	private function ccmd_usersEdit()
 	{
-		$form = $this->form;
-
-		if(!isset($form['user_id']) {
+		# TODO: This function has 6 exits
+		if(!isset($this->form['user_id']) {
 			return ['error' => true, 'error_message' => 'incorrect data!'];
 		} else {
 			$user_id = (int)$form['user_id'];
 		}
 
-		$username = $form['username'];
-		$first_name = $form['first_name'];
-		$last_name = $form['last_name'];
+		$username = $this->form['username'];
+		$first_name = $this->form['first_name'];
+		$last_name = $this->form['last_name'];
 		$is_active = 0;
-		if(isset($form['actuser']) && $form['actuser'] == 'on') $is_active = 1;
+		if(isset($this->form['actuser']) && $this->form['actuser'] == 'on') $is_active = 1;
 
 		$authorized_user_id = 0;
 		if(isset($_COOKIE['mhash'])){
 			$mhash = $_COOKIE['mhash'];
-			if(!preg_match('#^[a-f0-9]{32}$#', $mhash)) return ['error' => true,'error_message' => 'Bad data'];
+			if(!preg_match('#^[a-f0-9]{32}$#', $mhash)){
+				return ['error' => true,'error_message' => 'Bad data'];
+			}
 			$res1 = $this->db->selectOne("select user_id from auth_list WHERE sess_id=?", array([$mhash]));
 			if(isset($res1['user_id'])){
 				$authorized_user_id = (int)$res1['user_id'];
@@ -181,8 +180,8 @@ class Auth {
 			return ['error' => true, 'error_message' => 'I think you\'re some kind of hacker'];
 		}
 
-		if(isset($form['password'])){
-			$password = $this->getPasswordHash($form['password']);
+		if(isset($this->form['password'])){
+			$password = $this->getPasswordHash($this->form['password']);
 			$query = "UPDATE auth_user SET username=?,password=?,first_name=?,last_name=?,is_active=? WHERE id=?";
 			$res = $this->db->update($query, [
 				[$username],
@@ -207,11 +206,9 @@ class Auth {
 
 	private function ccmd_usersAdd()
 	{
-		$user_info = $this->form;
-
-		if(isset($user_info['username']) && isset($user_info['password'])){
-			$user = $user_info['username'];
-			$pass = $user_info['password'];
+		if(isset($this->form['username']) && isset($this->form['password'])){
+			$user = $this->form['username'];
+			$pass = $this->form['password'];
 			if ((strlen($user) < 4) || strlen($pass) < 6){
 				return ['error' => true, 'errorMessage' => 'Username or/and Password is not long enough!'];
 			}
@@ -222,18 +219,18 @@ class Auth {
 
 			$pass = $this->getPasswordHash($pass);
 			$is_active = 0;
-			if(isset($user_info['actuser']) && $user_info['actuser'] == 'on') $is_active = 1;
+			if(isset($this->form['actuser']) && $this->form['actuser'] == 'on') $is_active = 1;
 			$query = "INSERT INTO auth_user
 				(username,password,first_name,last_name,is_active,date_joined) VALUES
 				(?,?,?,?,?,datetime('now','localtime'))";
 			$res = $this->db->update($query, [
 				[$user],
 				[$pass],
-				[$user_info['first_name']],
-				[$user_info['last_name']],
+				[$this->form['first_name']],
+				[$this->form['last_name']],
 				[$is_active]
 			]);
-			return ['form' => $user_info];
+			return ['form' => $this->form];
 		} else {
 			return ['error' => true];
 		}
@@ -243,7 +240,7 @@ class Auth {
 	{
 		$id = (int)$this->form['user_id'];
 		if($id > 0){
-			return $this->db->select("DELETE FROM auth_user WHERE id=?", array([(int)$id, PDO::PARAM_INT]));
+			return $this->db->select("DELETE FROM auth_user WHERE id=?", array([$id, PDO::PARAM_INT]));
 		}
 	}
 
