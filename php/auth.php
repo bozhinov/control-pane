@@ -103,7 +103,7 @@ class Auth {
 		)
 		*/
 		try {
-			$form = $this->validate([
+			$form = $this->validate->these([
 				['login', 3],
 				['password', 5]
 			]);
@@ -157,7 +157,7 @@ class Auth {
 		# TODO: This function has 6 exits
 		try {
 			$this->validate->add_default('actuser', 'off');
-			$form = $this->validate([
+			$form = $this->validate->these([
 				['user_id', 2], # non-zero int
 				['username', 3],
 				['password', 5],
@@ -216,7 +216,7 @@ class Auth {
 	{
 		try {
 			$this->validate->add_default('actuser', 'off');
-			$form = $this->validate([
+			$form = $this->validate->these([
 				['username', 3],
 				['password', 5],
 				['first_name', 4],
@@ -247,7 +247,7 @@ class Auth {
 	private function ccmd_userRemove()
 	{
 		try {
-			$form = $this->validate([
+			$form = $this->validate->these([
 				['user_id', 1] # non-zero int
 			]);
 		} catch (Exception){
@@ -260,7 +260,7 @@ class Auth {
 	private function ccmd_userEditInfo()
 	{
 		try {
-			$form = $this->validate([
+			$form = $this->validate->these([
 				['user_id', 1], # non-zero int
 				['tbl_id'], 3],
 				['dialog'], 4] # TODO - THIS WILL FAIL

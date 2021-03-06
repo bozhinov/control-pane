@@ -4,9 +4,9 @@ class Validate {
 
 	private $f;
 
-	function __construct(array $form)
+	function __construct(array $pool)
 	{
-		$this->f = $form;
+		$this->f = $pool;
 	}
 
 	public static function short_string($string)
@@ -28,10 +28,10 @@ class Validate {
 		}
 	}
 
-	public function form(array $list)
+	public function these(array $list)
 	{
 		if (empty($this->f) {
-			throw new Exception("Form data is empty");
+			throw new Exception("Validation data pool is empty");
 		}
 
 		foreach($list as $e => $type){
