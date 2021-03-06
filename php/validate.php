@@ -12,7 +12,9 @@ class Validate {
 	public function add_default($key, $val)
 	{
 		// NOTE this appends to f and it will stay there
-		$this->f[$key] = $val;
+		if (!isset($this->f[$key])){
+			$this->f[$key] = $val;
+		}
 	}
 
 	public function form(array $list)
