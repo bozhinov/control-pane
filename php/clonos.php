@@ -20,6 +20,8 @@ class ClonOS
 	public $url_hash = '';
 	public $media_import = '';
 	public $username; # Comes from Auth
+	private $validate;
+	private $form_validate;
 	private $_vars = [];
 	private $_locale;
 	private $_db = null;
@@ -35,10 +37,8 @@ class ClonOS
 		'removebase','world','repo','forms'
 	];
 
-	function __construct($uri_chunks = null){
-
-		$this->_vars = $_POST;
-
+	function __construct($uri_chunks = null)
+	{
 		$this->workdir = getenv('WORKDIR'); # // /usr/jails
 		$this->environment = getenv('APPLICATION_ENV');
 		$this->realpath = '../'; # /usr/local/www/clonos/
@@ -50,16 +50,18 @@ class ClonOS
 			if(file_exists($sentry_file)) include($sentry_file);
 		}
 
-		if (is_null($uri_chunks)) { # TODO Do we need this ?
+		if (is_null($uri_chunks)) {
 			$this->uri_chunks = Utils::gen_uri_chunks(trim($_SERVER['REQUEST_URI'],'/'));
 		} else {
 			$this->uri_chunks = $uri_chunks;
 		}
 
 		$this->config = new Config();
+		# TODO by the end of all this we shouldn't need locale here
 		$this->_locale = new Localization($this->realpath_public);
+		$this->validate = new Validate($_POST);
 
-		if(isset($this->_vars['path'])){
+		if(isset($_POST['path'])){ # TODO Do we need this or just json?
 			$this->realpath_page = $this->realpath_public.'pages/'.$this->uri_chunks[0].'/';
 		} else if($_SERVER['REQUEST_URI']){
 			if(isset($this->uri_chunks[0])){
@@ -67,8 +69,12 @@ class ClonOS
 			}
 		}
 
-		if(isset($this->_vars['hash'])) $this->url_hash = preg_replace('/^#/','',$this->_vars['hash']);
-		if(isset($this->_vars['form_data'])) $this->form = $this->_vars['form_data'];
+		$this->validate->add_default('hash', '');
+		$this->url_hash == $this->validate->these([['path', 3]]);
+		$this->url_hash = preg_replace('/^#/', '', $this->url_hash);
+
+		$form_data = (isset($_POST['form_data'])) ? $_POST['form_data'] : [];
+		$this->form_validate = new Validate($form_data);
 	}
 
 	function getTableChunk($table_name, $tag)
@@ -241,7 +247,8 @@ class ClonOS
 	function _getTasksStatus()
 	{
 		$tasks = [];
-		$obj = json_decode($this->form['jsonObj'], true);
+		$validated = $this->form_validate->these([['jsonObj', 4]]);
+		$obj = json_decode($validated['jsonObj'], true);
 
 		if(isset($obj['proj_ops'])) return $this->GetProjectTasksStatus($obj);
 		if(isset($obj['mod_ops'])) return $this->GetModulesTasksStatus($obj);
@@ -347,16 +354,21 @@ class ClonOS
 
 	function ccmd_jailRename()
 	{
-		$form = $this->_vars['form_data'];
-		$cmd = "task owner=%s mode=new {cbsd_loc} jrename old=%s new=%s host_hostname=%s ip4_addr=%s restart=1";
-		$args = [
+		$form = $this->form_validate->these([
+			['oldJail', 3],
+			['jname', 3],
+			['host_hostname', 3], # Todo check max hostname len
+			['ip4_addr', 3], # TODO Add IP validation
+			['oldJail', 3],
+		]);
+
+		$res = CBSD::run("task owner=%s mode=new {cbsd_loc} jrename old=%s new=%s host_hostname=%s ip4_addr=%s restart=1", [
 			$this->username,
 			$form['oldJail'],
 			$form['jname'], 
 			$form['host_hostname'],
 			$form['ip4_addr']
-		];
-		$res = CBSD::run($cmd, $args);
+		]);
 
 		$err = 'Jail is not renamed!';
 		$taskId = -1;
@@ -507,14 +519,13 @@ class ClonOS
 	function jailAdd($redirect = '')
 	{
 		$form = $this->form;
-		$helper = preg_replace('/^#/', '', $this->_vars['hash']);
 		$db_path = '';
 		$with_img_helpers = '';
 		if($this->mode == 'saveHelperValues'){
-			if($helper == '' && $this->_vars['path'] == '/settings/') return $this->saveSettingsCBSD();
+			if($this->url_hash == '' && $this->uri_chunks[0] == 'settings') return $this->saveSettingsCBSD();
 
 			if(!isset($this->_vars['db_path'])){
-				$res = CBSD::run('make_tmp_helper module=%s', [$helper]);
+				$res = CBSD::run('make_tmp_helper module=%s', [$this->url_hash]);
 				if($res['retval'] == 0){
 					$db_path = $res['message'];
 				} else {
@@ -543,7 +554,6 @@ class ClonOS
 			$form['host_hostname'] = $form['jname'].'.my.domain';
 		}
 
-		$err = [];
 		$arr = [
 			'workdir' => $this->workdir,
 			'mount_devfs' => 1,

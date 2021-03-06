@@ -1,10 +1,9 @@
 <?php
-if(!empty($clonos->_vars['hash'])){
+
+if(!empty($clonos->url_hash)){
 	include('helpers.php');
 	return;
 }
-
-require_once("../php/cbsd.php");
 
 $sys_helpers = [];
 //	'network','cbsd','bhyvenet','general','zfsinstall','userspw','natcfg','jconstruct',
