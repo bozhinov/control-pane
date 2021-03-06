@@ -29,15 +29,17 @@ class Validate {
 			}
 		}
 
+		$r = [];
+
 		foreach($list as $e => $type){
 
 			switch($type){
 				case 1: # INT
-					$list[$e] = (int)$this->f[$e];
+					$r[$e] = (int)$this->f[$e];
 					break;
 				case 2: # INT 0 not accepted
-					$list[$e] = (int)$this->f[$e];
-					if($list[$e] == 0){
+					$r[$e] = (int)$this->f[$e];
+					if($r[$e] == 0){
 						throw new Exception($e." can't be 0");
 					}
 					break;
@@ -49,7 +51,7 @@ class Validate {
 					if ($len < 1 || $len > 20){
 						throw new Exception($e." string did not pass the lenght validation");
 					}
-					$list[$e] = $this->f[$e];
+					$r[$e] = $this->f[$e];
 					break;
 				case 4: # LONG STRING
 					if (filter_var($e, FILTER_SANITIZE_STRING) != $e){
@@ -59,7 +61,7 @@ class Validate {
 					if ($len < 1 || $len > 150){
 						throw new Exception($e." string did not pass the lenght validation");
 					}
-					$list[$e] = $this->f[$e];
+					$r[$e] = $this->f[$e];
 					break;
 				case 5: # STRING WITH SPECIAL CHARS
 					if (filter_var($e, FILTER_SANITIZE_SPECIAL_CHARS) != $e){
@@ -69,7 +71,7 @@ class Validate {
 					if ($len < 1 || $len > 20){
 						throw new Exception($e." string did not pass the lenght validation");
 					}
-					$list[$e] = $this->f[$e];
+					$r[$e] = $this->f[$e];
 					break;
 			}
 
@@ -82,7 +84,7 @@ class Validate {
 			}
 		}
 
-		return $list;
+		return $r;
 	}
 
 }
