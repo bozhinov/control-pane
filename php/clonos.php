@@ -37,9 +37,11 @@ class ClonOS
 	{
 		$this->workdir = getenv('WORKDIR'); # // /usr/jails
 		$this->environment = getenv('APPLICATION_ENV');
-		$this->realpath = '../'; # /usr/local/www/clonos/
-		$this->realpath_public = '../public/'; # /usr/local/www/clonos/public/
-		$this->media_import = '../media_import/';
+
+		$paths = Config::$paths;
+		$this->realpath = $paths['realpath'];
+		$this->realpath_public = $paths['public'];
+		$this->media_import = $paths['media_import'];;
 
 		if($this->environment == 'development'){
 			$sentry_file = '../php/sentry.php';

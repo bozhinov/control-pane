@@ -16,17 +16,17 @@ $cmd = '';
 $status = '';
 
 if($_SERVER['REQUEST_METHOD'] === 'POST'){
-	$path = realpath('').'/media/';
+	$path = Config::$paths['media'];
 	if(isset($_POST['uplace'])){
 		Validate::short_string($_POST['uplace']);
 		$res = strpos($_POST['uplace'], 'jailscontainers');
 		if($res !== false){
-			$path = $clonos->media_import;
+			$path = Config::$paths['media_import'];
 			$cmd = 'import';
 		}
 		$res = strpos($_POST['uplace'],'imported');
 		if($res !== false){
-			$path = $clonos->media_import;
+			$path = Config::$paths['media_import'];
 			$cmd = 'import';
 		}
 	}
@@ -67,7 +67,7 @@ $max_size = 30000 * 1024; // max file size in bytes
 
 if ( $_SERVER['REQUEST_METHOD'] === 'POST' ){
 	for($i = 0; $i < count($_FILES['file']['tmp_name']); $i++){
-		$path = "/media/";
+		$path = Config::$paths['media'];
 
 		if(is_uploaded_file($_FILES['file']['tmp_name'][$i]) ){
 			// get uploaded file extension

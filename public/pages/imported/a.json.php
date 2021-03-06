@@ -1,14 +1,5 @@
 <?php
 
-$res = [
-	0 => [
-		'id' => 1,
-		'name' => 'test',
-		'path' => 'test/test/',
-		'type' => 'клетка'
-	]
-];
-
 $images = $clonos->getImportedImages();
 $html = '';
 $nth = 0;

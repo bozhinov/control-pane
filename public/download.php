@@ -19,7 +19,7 @@ if(isset($_GET['file'])){
 	exit;
 }
 
-$file = $clonos->media_import.$file;
+$file = Config::$paths['media_import'].$file;
 
 header('Content-disposition: attachment; filename='.$filename);
 header('Content-type: application/octet-stream');

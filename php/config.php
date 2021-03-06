@@ -158,6 +158,13 @@ class Config
 		]
 	];
 
+	public static $paths = [
+		"realpath" => '../', # /usr/local/www/clonos/
+		"media_import" => '../media_import/',
+		"media" => '../public/media/', # /usr/local/www/clonos/public/media/
+		"public" => '../public/' # /usr/local/www/clonos/public/
+	];
+
 	public $os_types_obtain = [];
 	public $os_interface_names = [];
 
