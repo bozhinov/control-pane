@@ -33,42 +33,44 @@ class Auth {
 			}
 		}
 
-		$ccmd_res = ["authorized" => $this->authorized];
+		if ($this->json_req){
+			$ccmd_res = ["authorized" => $this->authorized];
 
-		if(isset($_REQUEST['mode'])){
+			if(isset($_REQUEST['mode'])){
 
-			if ($_REQUEST['mode'] != 'login')){
-				if(!$this->authorized){
-					echo json_encode(['error' => true, 'unregistered_user' => true]);
-					exit;
+				if ($_REQUEST['mode'] != 'login')){
+					if(!$this->authorized){
+						echo json_encode(['error' => true, 'unregistered_user' => true]);
+						exit;
+					}
+				}
+
+				switch ($_REQUEST['mode']){
+					case 'login':
+						$ccmd_res = $this->ccmd_login();
+						break;
+					case 'usersAdd':
+						$ccmd_res = $this->ccmd_usersAdd();
+						break;
+					case 'usersEdit':
+						$ccmd_res = $this->ccmd_usersEdit();
+						break;
+					case 'userRemove':
+						$ccmd_res = $this->ccmd_userRemove();
+						break;
+					case 'userGetInfo':
+						$ccmd_res = $this->ccmd_userGetInfo();
+						break;
+					case 'userEditInfo':
+						$ccmd_res = $this->ccmd_userEditInfo();
+						break;
+					#default: # Can't uncomment it right now until I have a dispatcher of a sort
+						# echo json_encode(['error' => true, 'unknown command' => true]);
 				}
 			}
 
-			switch ($_REQUEST['mode']){
-				case 'login':
-					$ccmd_res = $this->ccmd_login();
-					break;
-				case 'usersAdd':
-					$ccmd_res = $this->ccmd_usersAdd();
-					break;
-				case 'usersEdit':
-					$ccmd_res = $this->ccmd_usersEdit();
-					break;
-				case 'userRemove':
-					$ccmd_res = $this->ccmd_userRemove();
-					break;
-				case 'userGetInfo':
-					$ccmd_res = $this->ccmd_userGetInfo();
-					break;
-				case 'userEditInfo':
-					$ccmd_res = $this->ccmd_userEditInfo();
-					break;
-				#default: # Can't uncomment it right now until I have a dispatcher of a sort
-					# echo json_encode(['error' => true, 'unknown command' => true]);
-			}
+			echo json_encode($ccmd_res);
 		}
-
-		echo json_encode($ccmd_res);
 	}
 
 	private function getPasswordHash($password)
