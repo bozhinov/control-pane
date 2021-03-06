@@ -151,7 +151,8 @@ switch ($active){
 		$tpl->draw('dialogs/vpnet');
 		$tpl->draw('pages/'.$lang.'/vpnet');
 		break;
-			echo '<h1>Not implemented yet!</h1>';
+	default:
+		echo '<h1>Not implemented yet!</h1>';
 }
 
 $tpl->draw("index.2");
