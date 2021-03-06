@@ -9,10 +9,16 @@ if(
 	exit;
 }
 
-$path = trim($_REQUEST['path'], DIRECTORY_SEPARATOR);
+require_once('../php/cbsd.php');
+require_once('../php/config.php');
+require_once('../php/validate.php');
+require_once('../php/db.php');
+require_once('../php/auth.php');
+require_once('../php/clonos.php');
+require_once('../php/tpl.php');
 
-include('../php/clonos.php');
-include('../php/auth.php');
+Validate::short_string($_REQUEST['path']);
+$path = trim($_REQUEST['path'], DIRECTORY_SEPARATOR);
 
 $clonos = new ClonOS();
 $clonos->json_req = true;

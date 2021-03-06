@@ -9,6 +9,17 @@ class Validate {
 		$this->f = $form;
 	}
 
+	public static function short_string($string)
+	{
+		if (filter_var($string, FILTER_SANITIZE_STRING) != $string){
+			throw new Exception($string." string did not pass the validation");
+		}
+		$len = strlen($string);
+		if ($len < 1 || $len > 20){
+			throw new Exception($string." string did not pass the lenght validation");
+		}
+	}
+
 	public function add_default($key, $val)
 	{
 		// NOTE this appends to f and it will stay there
