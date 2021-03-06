@@ -498,7 +498,6 @@ class ClonOS
 	{
 		if(!isset($this->uri_chunks[1]) || trim($this->url_hash) == '') return ['error' => true, 'errorMessage' => 'Bad url!'];
 		$jail_name = $this->uri_chunks[1];
-		Validate::short_string($jail_name);
 
 		$db = new Db('helper', ['jname' => $jail_name, 'helper' => $this->url_hash]);
 		if(!$db->isConnected()) return ['error' => true, 'errorMessage' => 'No helper database!'];
@@ -951,7 +950,7 @@ class ClonOS
 				'dialog' => 4
 			]);
 		} catch(Exception $e){
-			return ['error' => true, 'error_message' => 'Bad jail id!'];
+			return ['error' => true, 'error_message' => 'Bad data!'];
 		}
 
 		$db = new Db('base','local');
@@ -988,7 +987,7 @@ class ClonOS
 				'jname' => 3
 			]);
 		} catch(Exception $e){
-			return ['error' => true, 'error_message' => 'Bad jail id!'];
+			return ['error' => true, 'error_message' => 'Bad data!'];
 		}
 
 		$res = CBSD::run(
@@ -1024,7 +1023,7 @@ class ClonOS
 				'dialog' => 4
 			]);
 		} catch(Exception $e){
-			return ['error' => true, 'error_message' => 'Bad jail id!'];
+			return ['error' => true, 'error_message' => 'Bad data!'];
 		}
 
 		$db = new Db('base','local');
@@ -1394,7 +1393,7 @@ class ClonOS
 				'keysrc' => 3
 			]);
 		} catch(Exception $e){
-			return ['error' => true, 'error_message' => 'Bad jail id!'];
+			return ['error' => true, 'error_message' => 'Bad key data!'];
 		}
 
 		$db = new Db('base','authkey');
@@ -1429,7 +1428,7 @@ class ClonOS
 		try {
 			$form = $this->form_validate->these(['auth_id' => 3]);
 		} catch(Exception $e){
-			return ['error' => true, 'error_message' => 'Bad jail id!'];
+			return ['error' => true, 'error_message' => 'Bad key data!'];
 		}
 		$db = new Db('base','authkey');
 		if(!$db->isConnected()) return ['error' => true, 'res' => 'Database error'];
@@ -1478,7 +1477,12 @@ class ClonOS
 
 	function ccmd_vpnetRemove()
 	{
-		$form = $this->_vars['form_data'];
+		try {
+			$form = $this->form_validate->these(['vpnet_id' => 3]);
+		} catch(Exception $e){
+			return ['error' => true, 'error_message' => 'Bad vpnet id!'];
+		}
+
 		$db = new Db('base', 'vpnet');
 		if(!$db->isConnected()) return ['error' => true, 'res' => 'Database error'];
 
@@ -1493,7 +1497,13 @@ class ClonOS
 		$db = new Db('base', 'storage_media');
 		if(!$db->isConnected()) return ['error' => true, 'res' => 'Database error'];
 
-		$db_res = $db->selectOne('SELECT name, path, jname, type FROM media WHERE idx=?', array([(int)$this->form['media_id'], PDO::PARAM_INT]));
+		try {
+			$form = $this->form_validate->these(['media_id' => 3]);
+		} catch(Exception $e){
+			return ['error' => true, 'error_message' => 'Bad media id!'];
+		}
+
+		$db_res = $db->selectOne('SELECT name, path, jname, type FROM media WHERE idx=?', array([(int)$form['media_id'], PDO::PARAM_INT]));
 		if(empty($db_res)) return ['error' => true, 'res'=> print_r($res, true)];
 
 		$res = CBSD::run('media mode=remove name="%s" path="%s" jname="%s" type="%s"', $db_res);
@@ -1502,7 +1512,7 @@ class ClonOS
 			$arr['error_message'] = 'File image was not deleted! '.$res['error_message'];
 		}
 
-		$arr['media_id'] = $this->form['media_id'];
+		$arr['media_id'] = $form['media_id'];
 		$arr['cmd'] = $res;
 
 		return $arr;
@@ -1510,7 +1520,12 @@ class ClonOS
 
 	function ccmd_srcRemove()
 	{
-		$ver = str_replace('src', '', $this->form['jname']);
+		try {
+			$form = $this->form_validate->these(['jname' => 3]);
+		} catch(Exception $e){
+			return ['error' => true, 'error_message' => 'Bad name!'];
+		}
+		$ver = str_replace('src', '', $form['jname']);
 		if(empty($ver)) return ['error' => true, 'errorMessage' => 'Version of sources is emtpy!'];
 		return CBSD::run(
 			'task owner=%s mode=new {cbsd_loc} removesrc inter=0 ver=%s jname=#src%s',
@@ -1520,7 +1535,12 @@ class ClonOS
 
 	function ccmd_srcUpdate()
 	{
-		$ver = str_replace('src', '', $this->form['jname']);
+		try {
+			$form = $this->form_validate->these(['jname' => 3]);
+		} catch(Exception $e){
+			return ['error' => true, 'error_message' => 'Bad name!'];
+		}
+		$ver = str_replace('src', '', $form['jname']);
 		$stable = (preg_match('#\.\d#', $ver)) ? 0 : 1;
 		if(empty($ver)) return ['error' => true, 'errorMessage' => 'Version of sources is emtpy!'];
 		return CBSD::run(
@@ -1566,7 +1586,12 @@ class ClonOS
 
 	function ccmd_baseRemove()
 	{
-		$id = $this->form['jname'];
+		try {
+			$form = $this->form_validate->these(['jname' => 3]);
+		} catch(Exception $e){
+			return ['error' => true, 'error_message' => 'Bad name!'];
+		}
+		$id = $form['jname'];
 		preg_match('#base([0-9\.]+)-([^-]+)-(\d+)#', $id, $res);
 		$ver = $res[1];
 		$arch = $res[2];
@@ -1574,15 +1599,18 @@ class ClonOS
 
 		return $this->CBSD::run(
 			'task owner=%s mode=new {cbsd_loc} removebase inter=0 stable=%s ver=%s arch=%s jname=#%s',
-			[$this->username, $stable, $ver, $arch, $this->form['jname']]
+			[$this->username, $stable, $ver, $arch, $id]
 		);
 	}
 
 	function ccmd_basesCompile()
 	{
-		$form = $this->form;
-		if(!isset($form['sources']) || !is_numeric($form['sources'])) return ['error' => true, 'errorMessage' => 'Wrong OS type selected!'];
-		$id = (int)$form['sources'];
+		try {
+			$form = $this->form_validate->these(['sources' => 1]);
+		} catch(Exception $e){
+			return ['error' => true, 'errorMessage' => 'Wrong OS type selected!'];
+		}
+		$id = $form['sources'];
 
 		$db = new Db('base','local');
 		if(!$db->isConnected()) return ['error'=>true,'errorMessage'=>'Database connect error!'];
@@ -1674,11 +1702,13 @@ class ClonOS
 
 	function ccmd_repoCompile()
 	{
-		if(!isset($this->form['version']) || !is_numeric($this->form['version'])) {
+		try {
+			$form = $this->form_validate->these(['version' => 1]);
+		} catch(Exception $e){
 			return ['error' => true, 'errorMessage' => 'Wrong OS type input!'];
 		}
 
-		$ver = $this->form['version'];
+		$ver = $form['version'];
 		$stable_arr = ['release','stable'];
 		$html = '';
 		$hres = $this->getTableChunk('baseslist', 'tbody');
@@ -1736,9 +1766,13 @@ class ClonOS
 
 	function ccmd_logLoad()
 	{
-		$log_id = $this->_vars['form_data']['log_id'];
-		if(!is_numeric($log_id)) return ['error' => 'Log ID must be a number'];
+		try {
+			$form = $this->form_validate->these(['log_id' => 1]);
+		} catch(Exception $e){
+			return ['error' => true, 'errorMessage' => 'Log ID must be a number'];
+		}
 
+		$log_id = $form['log_id'];
 		$html = '';
 		$buf = '';
 		$log_file = '/tmp/taskd.'.$log_id.'.log';
@@ -1765,7 +1799,7 @@ class ClonOS
 			return ['html'=>'<div style="font-weight:bold;">Log ID: '.$log_id.'</div><br />'.$html];
 		}
 
-		return ['error'=>'Log file is not exists!'];
+		return ['error' => true, 'errorMessage' => 'Log file is not exists!'];
 	}
 
 	function ccmd_logFlush()
@@ -1794,7 +1828,9 @@ class ClonOS
 	{
 		if($this->uri_chunks[0] != 'jailscontainers' || empty($this->uri_chunks[1])) return ['error' => true, 'errorMessage' => 'Bad url!'];
 		$jail_id = $this->uri_chunks[1];
-		$helpers = array_keys($this->form);
+
+		$form = $this->form_validate->all();
+		$helpers = array_keys($form);
 		foreach($helpers as $helper){
 			$res = CBSD::run(
 				'task owner=%s mode=new {cbsd_loc} forms inter=0 module=%s jname=%s',
@@ -1830,13 +1866,14 @@ class ClonOS
 	function addHelperGroup()
 	{
 		$module = $this->url_hash;
-		if(isset($this->form)){
-			$form = $this->form;
-		} else { 
-			$form = [];
-		}
-
-		if(isset($form['db_path']) && !empty($form['db_path']))	{
+		if ($this->form_validate->exists('db_path')){
+			var_dump($_POST); # TODO
+			throw new Exception("SECURITY PROBLEM 1");
+			try{
+				$this->form_validate->these(['db_path' => 4]);
+			} catch(Exception $e){
+				return ['error' => true, 'error_message' => 'Bad data!'];
+			}
 			$db_path = $form['db_path'];
 			if(!file_exists($db_path)){
 				$res = CBSD::run('make_tmp_helper module=%s', [$module]);
@@ -1859,15 +1896,18 @@ class ClonOS
 	function deleteHelperGroup()
 	{
 		$module = $this->url_hash;
-		if(isset($this->form)){
-			$form = $this->form;
-		} else {
-			$form = [];
+
+		try {
+			$form = $this->form_validate->these(['index' => 3, 'db_path' => 4]); # TODO: Figure out if this is a real file path and validate it.
+		} catch(Exception $e){
+			return ['error' => true, 'errorMessage' => 'Error on open temporary form file!'];
 		}
-		if(!isset($form['db_path']) || empty($form['db_path'])) return;
 
-		if(!file_exists($form['db_path'])) return ['error'=>true, 'errorMessage' => 'Error on open temporary form file!'];
+		if(!file_exists($form['db_path'])) return ['error' => true, 'errorMessage' => 'Error on open temporary form file!'];
 
+		var_dump($_POST); # TODO
+		throw new Exception("SECURITY PROBLEM 2");
+			
 		$index = $form['index'];
 		$index = str_replace('ind-', '', $index);
 
@@ -1883,13 +1923,17 @@ class ClonOS
 
 	function ccmd_deleteJailHelperGroup()
 	{
-		if(!isset($this->uri_chunks[1]) || !isset($this->url_hash)){
+		if(!isset($this->uri_chunks[1]) || trim($this->url_hash) != ''){
 			return ['error' => true,'errorMessage' => 'Bad url!'];
 		}
-
+		try {
+			$form = $this->form_validate->these(['index' => 3]);
+		} catch(Exception $e){
+			return ['error' => true, 'error_message' => 'Bad data!'];
+		}
 		$jail_id = $this->uri_chunks[1];
 		$helper = $this->url_hash;
-		$index = str_replace('ind-', '', $this->form['index']);
+		$index = str_replace('ind-', '', $form['index']);
 
 		$db = new Db('helper', ['jname' => $jail_id, 'helper' => $helper]);
 		if($db->error) return ['error'=> true, 'errorMessage' => 'No helper database!'];
@@ -1907,13 +1951,8 @@ class ClonOS
 	{
 		$arr = [];
 
-		/* TODO: CHECK THE ORIGINAL CODE
-			$add_cmd=($in_helper)?' default_jailname='.$this->url_hash:'';
-			$add_cmd1=' default_jailname='.$type;
-			$res=$this->cbsd_cmd("freejname".$add_cmd.$add_cmd1);
-		*/
 		if ($in_helper) {
-			$res = CBSD::run('freejname default_jailname=%s default_jailname=%s', [$this->url_hash, $type]);
+			$res = CBSD::run('freejname default_jailname=%s', [$this->url_hash]);
 		} else {
 			$res = CBSD::run('freejname default_jailname=%s', [$type]);
 		}
@@ -1944,7 +1983,7 @@ class ClonOS
 
 	function ccmd_k8sCreate()
 	{
-		$form = $this->form;
+		$form = $this->form_validate->all();
 		$res = [];
 		$ass_arr = [
 			'master_nodes' => 'init_masters',
@@ -1993,18 +2032,23 @@ class ClonOS
 
 	function ccmd_k8sRemove()
 	{
-		$form = $this->form;
+		try {
+			$form = $this->form_validate->these(['k8sname' => 3]);
+		} catch(Exception $e){
+			return ['error' => true, 'errorMessage' => 'Bad data!'];
+		}
+
 		if(isset($form['k8sname']) && !empty($form['k8sname'])){
 			$url = 'http://144.76.225.238/api/v1/destroy/'.$form['k8sname'];
 			return ($this->getCurl($url));
 		} else {
-			return ['error' => 'true', 'errorMessage' => 'something wrong...'];
+			return ['error' => 'true', 'errorMessage' => 'Something went wrong!'];
 		}
 	}
 
 	function postCurl($url, $vars = false)
 	{
-		if($vars === false) return ['error' => true, 'errorMessage' => 'something wrong...'];
+		if($vars === false) return ['error' => true, 'errorMessage' => 'Something went wrong!'];
 
 		$txt_vars = json_encode($vars);
 
@@ -2114,17 +2158,28 @@ class ClonOS
 
 	function ccmd_vmTemplateAdd()
 	{
+		try {
+			$form = $this->form_validate->these([
+				'name' => 3,
+				'description' => 4,
+				'pkg_vm_ram' => 3,
+				'pkg_vm_disk' => 3,
+				'pkg_vm_cpus' => 3
+			]);
+		} catch(Exception $e){
+			return ['error' => true, 'errorMessage' => 'Bad data!'];
+		}
 		$db = new Db('base', 'local');
 		if(!$db->isConnected()) return $this->messageError('data incorrect!');
 		$query = "INSERT INTO vmpackages (name,description,pkg_vm_ram,pkg_vm_disk,pkg_vm_cpus,owner,timestamp)
 			VALUES (?,?,?,?,?,?,datetime('now','localtime'))";
 
 		$res = $db->insert($query, [
-			[$this->form['name']],
-			[$this->form['description']],
-			[$this->form['pkg_vm_ram']],
-			[$this->form['pkg_vm_disk']],
-			[$this->form['pkg_vm_cpus']],
+			[$form['name']],
+			[$form['description']],
+			[$form['pkg_vm_ram']],
+			[$form['pkg_vm_disk']],
+			[$form['pkg_vm_cpus']],
 			[$this->username]
 		]);
 
@@ -2137,22 +2192,37 @@ class ClonOS
 
 	function ccmd_vmTemplateEditInfo()
 	{
-		if(!isset($this->form['template_id'])) return $this->messageError('incorrect data!');
+		try {
+			$form = $this->form_validate->these(['template_id' => 1]);
+		} catch(Exception $e){
+			return ['error' => true, 'errorMessage' => 'Bad data!'];
+		}
 
-		$tpl_id = (int)$this->form['template_id'];
 		$db = new Db('base', 'local');
 		if(!$db->isConnected()) return $this->messageError('DB connection error!');
 
 		$res = $db->selectOne(
 			"select name,description,pkg_vm_ram,pkg_vm_disk,pkg_vm_cpus from vmpackages where id=?",
-			array([$tpl_id, PDO::PARAM_INT])
+			array([$form['template_id'], PDO::PARAM_INT])
 		);
-		return $this->messageSuccess(['vars' => $res, 'template_id' => $tpl_id]);
+		return $this->messageSuccess(['vars' => $res, 'template_id' => $form['template_id']]);
 	}
 
 	function ccmd_vmTemplateEdit()
 	{
-		$id = $this->form['template_id'];
+		try {
+			$form = $this->form_validate->these([
+				'template_id' => 1,
+				'name' => 3,
+				'description' => 4,
+				'pkg_vm_ram' => 3,
+				'pkg_vm_disk' => 3,
+				'pkg_vm_cpus' => 3
+			]);
+		} catch(Exception $e){
+			return ['error' => true, 'errorMessage' => 'Bad data!'];
+		}
+
 		if(!isset($id) || $id < 1) $this->messageError('wrong data!');
 		$db = new Db('base','local');
 		if(!$db->isConnected()) return $this->messageError('db connection error!');
@@ -2162,11 +2232,11 @@ class ClonOS
 			where id=?";
 
 		$res = $db->update($query, [
-			[$this->form['name'], PDO::PARAM_STR],
-			[$this->form['description'], PDO::PARAM_STR],
-			[$this->form['pkg_vm_ram'],  PDO::PARAM_STR],
-			[$this->form['pkg_vm_disk'], PDO::PARAM_STR],
-			[$this->form['pkg_vm_cpus'], PDO::PARAM_STR],
+			[$form['name'], PDO::PARAM_STR],
+			[$form['description'], PDO::PARAM_STR],
+			[$form['pkg_vm_ram'],  PDO::PARAM_STR],
+			[$form['pkg_vm_disk'], PDO::PARAM_STR],
+			[$form['pkg_vm_cpus'], PDO::PARAM_STR],
 			[$this->username, PDO::PARAM_STR],
 			[(int)$id, PDO::PARAM_INT]
 		]);
@@ -2177,13 +2247,16 @@ class ClonOS
 
 	function ccmd_vmTemplateRemove()
 	{
-		$id = $this->form['template_id'];
-		if((int)$id <= 0) return $this->messageError('wrong data!');
+		try {
+			$form = $this->form_validate->these(['template_id' => 2]);
+		} catch(Exception $e){
+			return ['error' => true, 'errorMessage' => 'Bad data!'];
+		}
 
 		$db = new Db('base','local');
 		if(!$db->isConnected()) return $this->messageError('DB connection error!');
 
-		$res = $db->select("DELETE FROM vmpackages WHERE id=?", array([$id, PDO::PARAM_INT]));
+		$res = $db->select("DELETE FROM vmpackages WHERE id=?", array([$form['template_id'], PDO::PARAM_INT]));
 		return $this->messageSuccess($res);
 	}
 
@@ -2219,7 +2292,8 @@ class ClonOS
 
 	function ccmd_getImportedImageInfo()
 	{
-		return $this->getImageInfo($this->form['id']);
+		$form = $this->form_validate->these(['id' => 1]);
+		return $this->getImageInfo($form['id']);
 	}
 
 	function getImagesList($path)
@@ -2287,38 +2361,49 @@ class ClonOS
 	function ccmd_imageExport()
 	{
 		// cbsd jexport jname=XXX dstdir=<path_to_imported_dir>
-		$jname = $this->form['id'];
-		if(empty($jname)) $this->messageError('Jname is incorrect in export command! Is «'.$jname.'».');
+		try {
+			$form = $this->form_validate->these(['id' => 1]);
+		} catch(Exception $e){
+			$this->messageError('Jname is incorrect in export command! Is «'.$form['id'].'».');
+		}
 
 		return CBSD::run(
 			'task owner=%s mode=new {cbsd_loc} jexport gensize=1 jname=%s dstdir=%s',
-			[$this->username, $jname, $this->media_import]
+			[$this->username, $form['id'], $this->media_import]
 		);
 	}
 
 	function ccmd_imageImport()
 	{
-		$file_id = $this->form['file_id'];
-		$jname = $this->form['jname'];
-		$res = $this->getImageInfo($file_id);
+		try {
+			$form = $this->form_validate->these([
+				'file_id' => 3,
+				'jname' => 3,
+				'ip4_addr' => 3,
+				'host_hostname' => 3
+			]);
+		} catch(Exception $e){
+			return ['error' => true, 'error_message' => 'Bad data!'];
+		}
+		$res = $this->getImageInfo($form['file_id']);
 		if($res === false) return $this->messageError('File not found!');
 
 		$cmd = 'task owner=%s mode=new {cbsd_loc} jimport ';
 		$attrs = [$this->username];
 
-		if($jname != $res['orig_jname']) {
+		if($form['jname'] != $res['orig_jname']) {
 			$cmd .= 'new_jname=%s ';
-			$attrs[] = $jname;
+			$attrs[] = $form['jname'];
 		}
 
-		if($this->form['ip4_addr'] != $res['ip4_addr']){
+		if($form['ip4_addr'] != $res['ip4_addr']){
 			$cmd .= 'new_ip4_addr=%s ';
-			$attrs[] = $this->form['ip4_addr'];
+			$attrs[] = $form['ip4_addr'];
 		}
 
-		if($this->form['host_hostname'] != $res['host_hostname']) {
+		if($form['host_hostname'] != $res['host_hostname']) {
 			$cmd .= 'new_host_hostname=%s ';
-			$attrs[] = $this->form['host_hostname'];
+			$attrs[] = $form['host_hostname'];
 		}
 
 		$cmd .= 'jname=%s';
@@ -2329,20 +2414,26 @@ class ClonOS
 
 	function ccmd_imageRemove()
 	{
+		try {
+			$form = $this->form_validate->these(['jname' => 3]);
+		} catch(Exception $e){
+			return ['error' => true, 'errorMessage' => 'Bad data!'];
+		}
 		return CBSD::run(
 			'task owner=%s mode=new {cbsd_loc} imgremove path=%s img=$s',
-			[$this->username, $this->media_import, $this->form['jname']]
+			[$this->username, $this->media_import, $form['jname']]
 		);
 	}
 
 	function ccmd_getSummaryInfo()
 	{
-		$jail_name = $this->form['jname'];
-		$res = [];
-
-		if(empty($jail_name)) return $res;
-
-		$res['jname'] = $jail_name;
+		try {
+			$form = $this->form_validate->these(['jname' => 3, 'mode' => 3]);
+		} catch(Exception $e){
+			return ['error' => true, 'errorMessage' => 'Bad data!'];
+		}
+		$jail_name = $form['jname'];
+		$res = ['jname' = > $jail_name];
 
 		$db = new Db('racct', ['jname' => $jail_name]);
 		if($db->isConnected()){
@@ -2353,7 +2444,7 @@ class ClonOS
 			$res['__all'] = $query;
 		}
 
-		if($this->form['mode'] == 'bhyveslist'){
+		if($form['mode'] == 'bhyveslist'){
 			$res['properties'] = $this->getSummaryInfoBhyves();
 			return $res;
 		}
@@ -2402,7 +2493,13 @@ class ClonOS
 			'bhyve_x2apic_mode','bhyve_mptable_gen','bhyve_ignore_msr_acc','xhci'
 		];
 
-		$db = new Db('bhyve', ['jname' => $this->form['jname']]);
+		try {
+			$form = $this->form_validate->these(['jname' => 3]);
+		} catch(Exception $e){
+			return ['error' => true, 'errorMessage' => 'Bad data!'];
+		}
+
+		$db = new Db('bhyve', ['jname' => $form['jname']]);
 		if($db->isConnected()) {
 			$sql = "SELECT created, astart, vm_cpus, vm_ram, vm_os_type, vm_boot, vm_os_profile, bhyve_flags,
 				vm_vnc_port, virtio_type, bhyve_vnc_tcp_bind, bhyve_vnc_resolution, cd_vnc_wait,

@@ -11,6 +11,7 @@ if (isset($auth)){
 }
 
 if(isset($_GET['file'])){
+	Validate::long_string($_GET['file']);
 	$file = $_GET['file'];
 	$filename = $file;
 } else {

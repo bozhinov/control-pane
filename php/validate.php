@@ -15,9 +15,25 @@ class Validate {
 			throw new Exception($string." string did not pass the validation");
 		}
 		$len = strlen($string);
-		if ($len < 1 || $len > 20){
+		if ($len < 1 || $len > 34){
 			throw new Exception($string." string did not pass the lenght validation");
 		}
+	}
+
+	public static function long_string($string)
+	{
+		if (filter_var($string, FILTER_SANITIZE_STRING) != $string){
+			throw new Exception($string." string did not pass the validation");
+		}
+		$len = strlen($string);
+		if ($len < 1 || $len > 150){
+			throw new Exception($string." string did not pass the lenght validation");
+		}
+	}
+
+	public function exists($key)
+	{
+		return isset($this->f[$key]);
 	}
 
 	public function add_default($key, $val)
@@ -70,7 +86,7 @@ class Validate {
 						throw new Exception($e." string did not pass the validation");
 					}
 					$len = strlen($this->f[$e]);
-					if ($len < 1 || $len > 20){
+					if ($len < 1 || $len > 34){
 						throw new Exception($e." string did not pass the lenght validation");
 					}
 					$r[$e] = $this->f[$e];

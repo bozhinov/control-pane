@@ -18,6 +18,7 @@ $status = '';
 if($_SERVER['REQUEST_METHOD'] === 'POST'){
 	$path = realpath('').'/media/';
 	if(isset($_POST['uplace'])){
+		Validate::short_string($_POST['uplace']);
 		$res = strpos($_POST['uplace'], 'jailscontainers');
 		if($res !== false){
 			$path = $clonos->media_import;

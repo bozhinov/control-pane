@@ -12,6 +12,11 @@ class Utils
 			$str = trim($_POST['path'], '/');
 			$uri_chunks = explode('/', $str);
 		}
+
+		foreach ($uri_chunks as $u){
+			Validate::short_string($u);
+		}
+
 		return $uri_chunks;
 	}
 }
