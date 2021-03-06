@@ -1790,7 +1790,7 @@ class ClonOS
 			[$helper, $db_path, $index]
 		);
 		$html = (new Forms('', $helper, $db_path))->generate();
-		return ['html'=>$html];
+		return ['html' => $html];
 	}
 
 	function ccmd_getFreeJname($in_helper = false, $type = 'jail')
@@ -2355,14 +2355,14 @@ class ClonOS
 			if($ed == 'm' || $ed == 'g') $ed .= 'b';
 			if($ed == 'mb'){
 				$ram1 = substr($ram, 0, -1);
-				$ram1 = $ram1/1000000;
+				$ram1 = $ram1 / 1000000;
 			}
 			if($ed == 'gb'){
 				$ram1 = substr($ram, 0, -1);
-				$ram1 = $ram1/1000;
+				$ram1 = $ram1 / 1000;
 			}
 			$res1 = $cpu + $ram1;
-			if($min>$res1 || $min==0) {
+			if($min > $res1 || $min == 0) {
 				$min = $res1;
 				$min_id = $item['id'];
 			}
