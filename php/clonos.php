@@ -71,7 +71,7 @@ class ClonOS
 
 		# otherwise will fail validation. will trim it later
 		$this->validate->add_default('hash', ' ');
-		$this->url_hash == $this->validate->these([['hash', 3]]);
+		$this->url_hash == $this->validate->these(['hash' => 3]);
 		$this->url_hash = preg_replace('/^#/', '', $this->url_hash);
 
 		$form_data = (isset($_POST['form_data'])) ? $_POST['form_data'] : [];
@@ -248,7 +248,7 @@ class ClonOS
 	function _getTasksStatus()
 	{
 		$tasks = [];
-		$validated = $this->form_validate->these([['jsonObj', 4]]);
+		$validated = $this->form_validate->these(['jsonObj' => 4]);
 		$obj = json_decode($validated['jsonObj'], true);
 
 		if(isset($obj['proj_ops'])) return $this->GetProjectTasksStatus($obj);
@@ -356,11 +356,11 @@ class ClonOS
 	function ccmd_jailRename()
 	{
 		$form = $this->form_validate->these([
-			['oldJail', 3],
-			['jname', 3],
-			['host_hostname', 3], # Todo check max hostname len
-			['ip4_addr', 3], # TODO Add IP validation
-			['oldJail', 3],
+			'oldJail' => 3,
+			'jname' => 3,
+			'host_hostname' => 3, # Todo check max hostname len
+			'ip4_addr' => 3, # TODO Add IP validation
+			'oldJail' => 3
 		]);
 
 		$res = CBSD::run("task owner=%s mode=new {cbsd_loc} jrename old=%s new=%s host_hostname=%s ip4_addr=%s restart=1", [
@@ -390,7 +390,14 @@ class ClonOS
 
 	function ccmd_jailClone()
 	{
-		$form = $this->_vars['form_data'];
+		$form = $this->form_validate->these([
+			'oldJail' => 3,
+			'jname' => 3,
+			'host_hostname' => 3, # Todo check max hostname len
+			'ip4_addr' => 3, # TODO Add IP validation
+			'oldJail' => 3
+		]);
+
 		$cmd = 'task owner=%s mode=new {cbsd_loc} jclone checkstate=0 old=%s new=%s host_hostname=%s ip4_addr=%s';
 		$args = [
 			$this->username,
@@ -489,13 +496,15 @@ class ClonOS
 
 	function ccmd_saveJailHelperValues()
 	{
-		if(!isset($this->uri_chunks[1]) || !isset($this->url_hash)) return ['error' => true, 'errorMessage' => 'Bad url!'];
+		if(!isset($this->uri_chunks[1]) || trim($this->url_hash) == '') return ['error' => true, 'errorMessage' => 'Bad url!'];
 		$jail_name = $this->uri_chunks[1];
+		Validate::short_string($jail_name);
 
 		$db = new Db('helper', ['jname' => $jail_name, 'helper' => $this->url_hash]);
 		if(!$db->isConnected()) return ['error' => true, 'errorMessage' => 'No helper database!'];
-	
-		foreach($this->form as $key => $val) {
+
+		$form = $this->form_validate->all();
+		foreach($form as $key => $val) {
 			if($key != 'jname' && $key != 'ip4_addr') {
 				$db->update("update forms set new=? where param=?", array([$val], [$key]));
 			}
@@ -519,11 +528,12 @@ class ClonOS
 
 	function jailAdd($redirect = '')
 	{
-		$form = $this->form;
+		$form = $this->form_validate->all();
+
 		$db_path = '';
 		$with_img_helpers = '';
 		if($this->mode == 'saveHelperValues'){
-			if($this->url_hash == '' && $this->uri_chunks[0] == 'settings') return $this->saveSettingsCBSD();
+			if(trim($this->url_hash) == '' && $this->uri_chunks[0] == 'settings') return $this->saveSettingsCBSD();
 
 			if(!isset($this->_vars['db_path'])){
 				$res = CBSD::run('make_tmp_helper module=%s', [$this->url_hash]);
@@ -652,10 +662,17 @@ class ClonOS
 	function ccmd_jailRenameVars()
 	{
 		$res = [];
-		$form = $this->_vars['form_data'];
-		if(!isset($form['jail_id'])) return ['error' => true, 'error_message' => 'Bad jail id!'];
-
 		$err = false;
+
+		try {
+			$form = $this->form_validate->these([
+				'jail_id' => 3,
+				'dialog' => 4
+			]);
+		} catch(Exception $e){
+			return ['error' => true, 'error_message' => 'Bad jail id!'];
+		}
+
 		$db = new Db('base','local');
 		if($db->isConnected()){
 			$query = "SELECT jname,host_hostname FROM jails WHERE jname=?;"; //ip4_addr
@@ -687,11 +704,18 @@ class ClonOS
 	function ccmd_jailCloneVars()
 	{
 		$res = [];
-		$form = $this->_vars['form_data'];
-		if(!isset($form['jail_id'])) return ['error' => true, 'error_message' => 'Bad jail id!'];
-
 		$err = false;
-		$db= new Db('base','local');
+
+		try {
+			$form = $this->form_validate->these([
+				'jail_id' => 3,
+				'dialog' => 4
+			]);
+		} catch(Exception $e){
+			return ['error' => true, 'error_message' => 'Bad jail id!'];
+		}
+
+		$db = new Db('base','local');
 		if($db->isConnected()){
 			$query = "SELECT jname,host_hostname FROM jails WHERE jname=?;";	//ip4_addr
 			$res['vars'] = $db->selectOne($query, array([$form['jail_id']]));
@@ -721,10 +745,17 @@ class ClonOS
 	function ccmd_jailEditVars()
 	{
 		$res = [];
-		$form = $this->_vars['form_data'];
-		if(!isset($form['jail_id'])) return ['error' => true, 'error_message' => 'Bad jail id!'];
-
 		$err = false;
+
+		try {
+			$form = $this->form_validate->these([
+				'jail_id' => 3,
+				'dialog' => 4
+			]);
+		} catch(Exception $e){
+			return ['error' => true, 'error_message' => 'Bad jail id!'];
+		}
+
 		$db = new Db('base','local');
 		if($db->isConnected()){
 			$query = "SELECT jname,host_hostname,ip4_addr,allow_mount,interface,mount_ports,astart,vnet FROM jails WHERE jname=?;";
@@ -750,9 +781,8 @@ class ClonOS
 
 	function ccmd_jailEdit()
 	{
-		$form = $this->_vars['form_data'];
+		$form = $this->form_validate->all();
 		$str = [];
-		$jname = $form['jname'];
 		$arr = ['host_hostname','ip4_addr','allow_mount','interface','mount_ports','astart','vnet'];
 		foreach($arr as $a){
 			if(isset($form[$a])){
@@ -764,7 +794,7 @@ class ClonOS
 			}
 		}
 
-		$res = CBSD::run('jset jname=%s %s', [$jname, join(' ', $str)]);
+		$res = CBSD::run('jset jname=%s %s', [$form['jname'], join(' ', $str)]);
 		$res['mode'] = $this->mode;
 		$res['form'] = $form;
 		return $res;
@@ -772,39 +802,50 @@ class ClonOS
 
 	function ccmd_jailStart()
 	{
+		$form = $this->form_validate->these(['jname' => 3]);
 		return CBSD::run(
 			'task owner=%s mode=new {cbsd_loc} jstart inter=0 jname=%s',
-			[$this->username, $this->_vars['form_data']['jname']]
+			[$this->username, $form['jname']]
 		); // autoflush=2
 	}
 
 	function ccmd_jailStop()
 	{
+		$form = $this->form_validate->these(['jname' => 3]);
 		return CBSD::run(
 			'task owner=%s mode=new {cbsd_loc} jstop inter=0 jname=%s',
-			[$$this->username, $this->_vars['form_data']['jname']]
+			[$$this->username, $form['jname']]
 		); // autoflush=2
 	}
 
 	function ccmd_jailRestart()
 	{
+		$form = $this->form_validate->these(['jname' => 3]);
 		return CBSD::run(
 			'task owner=%s mode=new {cbsd_loc} jrestart inter=0 jname=%s',
-			[$this->username, $this->_vars['form_data']['jname']]
+			[$this->username, $form['jname']]
 		);	// autoflush=2
 	}
 
 	function ccmd_jailRemove()
 	{
+		$form = $this->form_validate->these(['jname' => 3]);
 		return CBSD::run(
 			'task owner=%s mode=new {cbsd_loc} jremove inter=0 jname=%s',
-			[$this->username, $this->_vars['form_data']['jname']]
+			[$this->username, $form['jname']]
 		);	// autoflush=2
 	}
 
 	function ccmd_bhyveClone()
 	{
-		$form = $this->_vars['form_data'];
+		$form = $this->form_validate->these([
+			'jname' => 3,
+			'oldBhyve' => 3,
+			'vm_name' => 3,
+			'vm_ram' => 3,
+			'vm_cpus' => 3,
+			'vm_os_type' => 3
+		]);
 		$res = CBSD::run(
 			'task owner=%s mode=new {cbsd_loc} bclone checkstate=0 old=%s new=%s',
 			[$this->username, $form['oldBhyve'], $form['vm_name']]
@@ -902,10 +943,17 @@ class ClonOS
 	function ccmd_bhyveEditVars()
 	{
 		$res = [];
-		$form = $this->_vars['form_data'];
-		if(!isset($form['jail_id'])) return ['error' => true, 'error_message' => 'Bad jail id!'];
-
 		$err = false;
+
+		try {
+			$form = $this->form_validate->these([
+				'jail_id' => 3,
+				'dialog' => 4
+			]);
+		} catch(Exception $e){
+			return ['error' => true, 'error_message' => 'Bad jail id!'];
+		}
+
 		$db = new Db('base','local');
 		if($db->isConnected())	{
 			$query = "SELECT b.jname as vm_name,vm_cpus,vm_ram,vm_vnc_port,bhyve_vnc_tcp_bind,interface FROM bhyve AS b INNER JOIN jails AS j ON b.jname=j.jname AND b.jname=?;";
@@ -934,8 +982,15 @@ class ClonOS
 
 	function ccmd_bhyveRename()
 	{
-		$form = $this->_vars['form_data'];
-		# TODO validate oldJail & jname
+		try {
+			$form = $this->form_validate->these([
+				'oldJail' => 3,
+				'jname' => 3
+			]);
+		} catch(Exception $e){
+			return ['error' => true, 'error_message' => 'Bad jail id!'];
+		}
+
 		$res = CBSD::run(
 			"task owner=%s mode=new /usr/local/bin/cbsd brename old=%s new=%s restart=1",
 			[$this->username, $form['oldJail'], $form['jname']]
@@ -961,17 +1016,22 @@ class ClonOS
 	function ccmd_bhyveRenameVars()
 	{
 		$res = [];
-		$form = $this->_vars['form_data'];
-		# TODO validate jail_id & dialog
-		if(!isset($form['jail_id'])) return ['error' => true, 'error_message' => 'Bad jail id!'];
-
-		$jname = $form['jail_id'];
 		$err = false;
+
+		try {
+			$form = $this->form_validate->these([
+				'jail_id' => 3,
+				'dialog' => 4
+			]);
+		} catch(Exception $e){
+			return ['error' => true, 'error_message' => 'Bad jail id!'];
+		}
+
 		$db = new Db('base','local');
 		if($db->isConnected()){
 			$res['vars'] = $db->selectOne(
 				"SELECT jname,vm_ram,vm_cpus,vm_os_type,hidden FROM bhyve WHERE jname=?", [
-				[$jname]
+				[$form['jail_id']]
 			]);
 		} else {
 			$err = true;
@@ -981,8 +1041,8 @@ class ClonOS
 
 		if($err){
 			$res['error'] = true;
-			$res['error_message'] = $this->_locale->translate('Jail '.$jname.' is not present.');
-			$res['jail_id'] = $jname;
+			$res['error_message'] = $this->_locale->translate('Jail '.$form['jail_id'].' is not present.');
+			$res['jail_id'] = $form['jail_id'];
 //			$res['reload']=true;
 			return $res;
 		}
@@ -995,7 +1055,7 @@ class ClonOS
 
 	function ccmd_bhyveEdit()
 	{
-		$form = $this->form;
+		$form = $this->form_validate->all();
 		$str = [];
 		$jname = $form['jname'];
 
@@ -1051,7 +1111,7 @@ class ClonOS
 
 	function ccmd_bhyveAdd()
 	{
-		$form = $this->form;
+		$form = $this->form_validate->all();
 		$os_types = $this->config->os_types;
 		$sel_os = $form['vm_os_profile'];
 		list($os_num, $item_num) = explode('.',$sel_os);
@@ -1172,7 +1232,7 @@ class ClonOS
 
 	function ccmd_bhyveObtain()
 	{
-		$form = $this->_vars['form_data'];
+		$form = $this->form_validate->all();
 		$os_types = $this->config->os_types;
 		$os_types_obtain = $this->config->os_types_obtain;
 		$sel_os = $form['vm_os_profile'];
@@ -1206,30 +1266,44 @@ class ClonOS
 			$authkey = '';
 		}
 
-		$user_pw = (!empty($form['user_password'])) ? ' ci_user_pw_user='.$form['user_password'].' ' : '';
+		$params = [
+			$this->username,
+			$form['vm_name'],
+			$os_profile,
+			$form['vm_size'],
+			$form['vm_cpus'],
+			$form['vm_ram'],
+			$os_type,
+			$form['mask'],
+			$form['ip4_addr'],
+			$form['ip4_addr'],
+			$form['gateway'],
+			$authkey,
+			$form['vm_password']
+		];
 
-		$res = CBSD::run( // TODO: THIS SEEMS WRONG pw_user={$form['vm_password']} {$user_pw}vnc_password={$form['vnc_password']}";
-			'task owner=%s mode=new {cbsd_loc} bcreate jname=%s 
-			vm_os_profile="%s" imgsize=%s vm_cpus=%s vm_ram=%s vm_os_type=%s mask=%s 
-			ip4_addr=%s ci_ip4_addr=%s ci_gw4=%s ci_user_pubkey="%s" ci_user_pw_user=%s %svnc_password=%s',
-			[
-				$this->username,
-				$form['vm_name'],
-				$os_profile,
-				$form['vm_size'],
-				$form['vm_cpus'],
-				$form['vm_ram'],
-				$os_type,
-				$form['mask'],
-				$form['ip4_addr'],
-				$form['ip4_addr'],
-				$form['gateway'],
-				$authkey,
-				$form['vm_password'],
-				$user_pw,
-				$form['vnc_password']
-			]
-		);
+		if (empty($form['user_password'])){
+
+			$params[] = $form['vnc_password'];
+
+			$res = CBSD::run(
+				'task owner=%s mode=new {cbsd_loc} bcreate jname=%s 
+				vm_os_profile="%s" imgsize=%s vm_cpus=%s vm_ram=%s vm_os_type=%s mask=%s 
+				ip4_addr=%s ci_ip4_addr=%s ci_gw4=%s ci_user_pubkey="%s" vnc_password=%s',
+				$params
+			);
+		} else {
+
+			$params[] = $user_pw;
+			$params[] = $form['vnc_password'];
+
+			$res = CBSD::run(
+				'task owner=%s mode=new {cbsd_loc} bcreate jname=%s 
+				vm_os_profile="%s" imgsize=%s vm_cpus=%s vm_ram=%s vm_os_type=%s mask=%s 
+				ip4_addr=%s ci_ip4_addr=%s ci_gw4=%s ci_user_pubkey="%s" ci_user_pw_user=%s vnc_password=%s',
+				$params
+			);
+		}
 
 		$err = 'Virtual Machine is not created!';
 		$taskId = -1;
@@ -1278,42 +1352,55 @@ class ClonOS
 
 	function ccmd_bhyveStart()
 	{
+		$form = $this->form_validate->these(['jname' => 3]);
 		return CBSD::run(
 			'task owner=%s mode=new {cbsd_loc} bstart inter=0 jname=%s',
-			[$this->username, $this->form['jname']]
+			[$this->username, $form['jname']]
 		);	// autoflush=2
 	}
 
 	function ccmd_bhyveStop()
 	{
+		$form = $this->form_validate->these(['jname' => 3]);
 		return CBSD::run(
 			'task owner=%s mode=new {cbsd_loc} bstop inter=0 jname=%s',
-			[$this->username, $this->form['jname']]
+			[$this->username, $form['jname']]
 		);	// autoflush=2
 	}
 
 	function ccmd_bhyveRestart()
 	{
+		$form = $this->form_validate->these(['jname' => 3]);
 		return CBSD::run(
 			'task owner=%s mode=new {cbsd_loc} brestart inter=0 jname=%s',
-			[$this->username, $this->form['jname']]
+			[$this->username, $form['jname']]
 		);	// autoflush=2
 	}
 
 	function ccmd_bhyveRemove()
 	{
+		$form = $this->form_validate->these(['jname' => 3]);
 		return CBSD::run(
 			'task owner=%s mode=new {cbsd_loc} bremove inter=0 jname=%s',
-			[$this->username, $this->form['jname']]
+			[$this->username, $form['jname']]
 		);	// autoflush=2
 	}
 
 	function ccmd_authkeyAdd()
 	{
+		try {
+			$form = $this->form_validate->these([
+				'keyname' => 3,
+				'keysrc' => 3
+			]);
+		} catch(Exception $e){
+			return ['error' => true, 'error_message' => 'Bad jail id!'];
+		}
+
 		$db = new Db('base','authkey');
 		if(!$db->isConnected()) return ['error' => 'Database error'];
 
-		$res = $db->insert("INSERT INTO authkey (name,authkey) VALUES (?, ?)", array([$this->form['keyname']], [$this->form['keysrc']]));
+		$res = $db->insert("INSERT INTO authkey (name,authkey) VALUES (?, ?)", array([$form['keyname']], [$form['keysrc']]));
 		if($res['error']) return ['error' => $res];
 		
 		$html = '';
@@ -1322,8 +1409,8 @@ class ClonOS
 			$html_tpl = $hres[1];
 			$vars = [
 				'keyid' => $res['lastID'],
-				'keyname' => $this->form['keyname'],
-				'keysrc' => $this->form['keysrc'],
+				'keyname' => $form['keyname'],
+				'keysrc' => $form['keysrc'],
 				'deltitle' => $this->_locale->translate('Delete')
 			];
 
@@ -1333,12 +1420,17 @@ class ClonOS
 			$html = $html_tpl;
 		}
 
-		return ['keyname' => $this->form['keyname'], 'html' => $html];
+		return ['keyname' => $form['keyname'], 'html' => $html];
 	}
 
 	function ccmd_authkeyRemove()
 	{
-		$form = $this->_vars['form_data'];
+
+		try {
+			$form = $this->form_validate->these(['auth_id' => 3]);
+		} catch(Exception $e){
+			return ['error' => true, 'error_message' => 'Bad jail id!'];
+		}
 		$db = new Db('base','authkey');
 		if(!$db->isConnected()) return ['error' => true, 'res' => 'Database error'];
 
@@ -1350,7 +1442,14 @@ class ClonOS
 
 	function ccmd_vpnetAdd()
 	{
-		$form = $this->_vars['form_data'];
+		try {
+			$form = $this->form_validate->these([
+				'network' => 3,
+				'netname' => 3
+			]);
+		} catch(Exception $e){
+			return ['error' => true, 'error_message' => 'Bad jail id!'];
+		}
 		$db = new Db('base','vpnet');
 		if(!$db->isConnected()) return ['error' => 'Database error'];
 

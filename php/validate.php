@@ -28,6 +28,17 @@ class Validate {
 		}
 	}
 
+	public function all()
+	{
+		foreach($this->f as $f){
+			if (filter_var($f, FILTER_SANITIZE_STRING) != $f){
+				throw new Exception($f." string did not pass the validation");
+			}
+		}
+
+		return $this->f;
+	}
+
 	public function these(array $list)
 	{
 		if (empty($this->f) {

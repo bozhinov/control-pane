@@ -104,8 +104,8 @@ class Auth {
 		*/
 		try {
 			$form = $this->validate->these([
-				['login', 3],
-				['password', 5]
+				'login' => 3,
+				'password' => 5
 			]);
 		} catch (Exception){
 			return ['message' => 'unregistered user', 'errorCode' => 1];
@@ -158,12 +158,12 @@ class Auth {
 		try {
 			$this->validate->add_default('actuser', 'off');
 			$form = $this->validate->these([
-				['user_id', 2], # non-zero int
-				['username', 3],
-				['password', 5],
-				['first_name', 4],
-				['last_name', 4],
-				['actuser', 33] # Non mandatory
+				'user_id' => 2, # non-zero int
+				'username' => 3,
+				'password' => 5,
+				'first_name' => 4,
+				'last_name' => 4,
+				'actuser' => 3
 			]);
 		} catch (Exception){
 			return ['error' => true, 'error_message' => 'incorrect data!'];
@@ -217,11 +217,11 @@ class Auth {
 		try {
 			$this->validate->add_default('actuser', 'off');
 			$form = $this->validate->these([
-				['username', 3],
-				['password', 5],
-				['first_name', 4],
-				['last_name', 4],
-				['actuser', 3]
+				'username' => 3,
+				'password' => 5,
+				'first_name' => 4,
+				'last_name' => 4,
+				'actuser' => 3
 			]);
 		} catch (Exception){
 			return ['error' => true, 'error_message' => 'incorrect data!'];
@@ -248,7 +248,7 @@ class Auth {
 	{
 		try {
 			$form = $this->validate->these([
-				['user_id', 1] # non-zero int
+				'user_id' => 1 # non-zero int
 			]);
 		} catch (Exception){
 			return ['error' => true, 'error_message' => 'incorrect data!'];
@@ -261,9 +261,9 @@ class Auth {
 	{
 		try {
 			$form = $this->validate->these([
-				['user_id', 1], # non-zero int
-				['tbl_id'], 3],
-				['dialog'], 4] # TODO - THIS WILL FAIL
+				'user_id' => 1, # non-zero int
+				'tbl_id' => 3,
+				'dialog' => 4 # TODO - THIS WILL FAIL
 			]);
 		} catch (Exception){
 			return ['error' => true, 'error_message' => 'incorrect data!'];
