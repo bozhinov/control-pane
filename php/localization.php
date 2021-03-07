@@ -7,7 +7,10 @@ class Localization
 
 	function __construct()
 	{
-		(isset($_COOKIE['lang'])) AND $this->language = $_COOKIE['lang'];
+		if (isset($_COOKIE['lang'])){
+			$this->language = $_COOKIE['lang'];
+			Validate::short_string($this->language);
+		}
 		(!array_key_exists($this->language, Config::$languages)) AND $this->language = 'en';
 		include('../public/lang/'.$this->language.'.php');
 		$this->translate_arr = $lang;
