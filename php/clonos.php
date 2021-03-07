@@ -356,8 +356,8 @@ class ClonOS
 		$form = $this->form_validate->these([
 			'oldJail' => 3,
 			'jname' => 3,
-			'host_hostname' => 3, # Todo check max hostname len
-			'ip4_addr' => 3, # TODO Add IP validation
+			'host_hostname' => 3, # TODO check max hostname len
+			'ip4_addr' => 6,
 			'oldJail' => 3
 		]);
 
@@ -391,8 +391,8 @@ class ClonOS
 		$form = $this->form_validate->these([
 			'oldJail' => 3,
 			'jname' => 3,
-			'host_hostname' => 3, # Todo check max hostname len
-			'ip4_addr' => 3, # TODO Add IP validation
+			'host_hostname' => 3, # TODO check max hostname len
+			'ip4_addr' => 6,
 			'oldJail' => 3
 		]);
 
@@ -2377,7 +2377,7 @@ class ClonOS
 			$form = $this->form_validate->these([
 				'file_id' => 3,
 				'jname' => 3,
-				'ip4_addr' => 3,
+				'ip4_addr' => 6,
 				'host_hostname' => 3
 			]);
 		} catch(Exception $e){

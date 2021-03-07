@@ -26,6 +26,13 @@ class Validate {
 		}
 	}
 
+	public static function url($url)
+	{
+		if (filter_var($url, FILTER_SANITIZE_URL) != $url){
+			throw new Exception($string." string did not pass the validation");
+		}
+	}
+
 	public static function long_string($string)
 	{
 		if (filter_var($string, FILTER_SANITIZE_STRING) != $string){
@@ -114,6 +121,12 @@ class Validate {
 					$len = strlen($this->f[$e]);
 					if ($len < 1 || $len > 20){
 						throw new Exception($e." string did not pass the lenght validation");
+					}
+					$r[$e] = $this->f[$e];
+					break;
+				case 6: # IP v4
+					if (filter_var($e, FILTER_FLAG_IPV4) != $e){
+						throw new Exception($e." string did not pass the validation");
 					}
 					$r[$e] = $this->f[$e];
 					break;

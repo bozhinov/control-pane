@@ -10,6 +10,7 @@ class Utils
 			$uri_chunks = explode('/', $str);
 		}else if(isset($_POST['path'])){
 			$str = trim($_POST['path'], '/');
+			Validate::url($str);
 			$uri_chunks = explode('/', $str);
 		}
 
