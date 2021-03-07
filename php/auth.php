@@ -23,7 +23,7 @@ class Auth {
 		$this->validate = new Validate($f);
 
 		if(isset($_COOKIE['mhash'])){ # TODO table 'auth_list' needs to be stored in memory not sqlite
-			Validate::short_string($_COOKIE['mhash']);
+			Validate::short_string($_COOKIE['mhash'], 32);
 			$query = "SELECT au.id,au.username FROM auth_user au, auth_list al WHERE al.secure_sess_id=? AND au.id=al.user_id AND au.is_active=1";
 			$res = $this->db->selectOne($query, array([md5($_COOKIE['mhash'].$this->_client_ip)]));
 			if(isset($res['id'])){
@@ -175,7 +175,7 @@ class Auth {
 
 		if(isset($_COOKIE['mhash'])){
 			$mhash = $_COOKIE['mhash'];
-			Validate::short_string($mhash);
+			Validate::short_string($mhash, 32);
 			if(!preg_match('#^[a-f0-9]{32}$#', $mhash)){
 				return ['error' => true,'error_message' => 'Bad data'];
 			}

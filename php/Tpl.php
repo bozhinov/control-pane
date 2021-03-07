@@ -39,7 +39,7 @@ class Tpl {
 		if ($use_locale){
 			if (isset($_COOKIE['lang'])){
 				$this->language = $_COOKIE['lang'];
-				Validate::short_string($this->language);
+				Validate::short_string($this->language, 2);
 			}
 			(!array_key_exists($this->language, Config::$languages)) AND $this->language = 'en';
 			include($this->config['lang_dir'].$this->language.'.php');

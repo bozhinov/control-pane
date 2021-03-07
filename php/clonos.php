@@ -68,7 +68,7 @@ class ClonOS
 
 		if (isset($_POST['hash'])){
 			$this->url_hash == $_POST['hash'];
-			Validate::short_string($this->url_hash);
+			Validate::short_string($this->url_hash, 32);
 			$this->url_hash = preg_replace('/^#/', '', $this->url_hash);
 		}
 

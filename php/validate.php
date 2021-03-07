@@ -9,14 +9,20 @@ class Validate {
 		$this->f = $pool;
 	}
 
-	public static function short_string($string)
+	public static function short_string($string, $exact_len = 0)
 	{
 		if (filter_var($string, FILTER_SANITIZE_STRING) != $string){
 			throw new Exception($string." string did not pass the validation");
 		}
 		$len = strlen($string);
-		if ($len < 1 || $len > 34){
-			throw new Exception($string." string did not pass the lenght validation");
+		if ($exact_len > 0){
+			if ($len != $exact_len) {
+				throw new Exception($string." string did not pass the lenght validation");
+			}
+		} else {
+			if ($len < 1 || $len > 34){
+				throw new Exception($string." string did not pass the lenght validation");
+			}
 		}
 	}
 
