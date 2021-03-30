@@ -70,7 +70,7 @@ class Validate {
 
 	public function these(array $list)
 	{
-		if (empty($this->f) {
+		if (empty($this->f)) {
 			throw new Exception("Validation data pool is empty");
 		}
 
